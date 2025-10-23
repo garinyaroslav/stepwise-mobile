@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/teacher_navigation"
+    app:startDestination="@id/teacher_home_fragment">
+
+    <fragment
+        android:id="@+id/teacher_home_fragment"
+        android:name="com.github.stepwise.ui.teacher.TeacherHomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_teacher_home" />
+
+    <fragment
+        android:id="@+id/teacher_projects_fragment"
+        android:name="com.github.stepwise.ui.teacher.TeacherProjectsFragment"
+        android:label="Projects"
+        tools:layout="@layout/fragment_teacher_projects" />
+
+    <fragment
+        android:id="@+id/teacher_profile_fragment"
+        android:name="com.github.stepwise.ui.teacher.TeacherProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_teacher_profile" />
+</navigation>
