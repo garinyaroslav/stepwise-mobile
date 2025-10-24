@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.github.stepwise.databinding.FragmentLoginBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.LoginRequest
+import com.github.stepwise.network.models.LoginResponse
 import com.github.stepwise.StudentActivity
 import com.github.stepwise.TeacherActivity
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +41,9 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.editTextUsername.setText("student")
+        binding.editTextPassword.setText("Qq@123456")
+
         binding.buttonLogin.setOnClickListener {
             val username = binding.editTextUsername.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
@@ -63,40 +67,12 @@ class LoginFragment : Fragment() {
                 }
 
                 if (response.isSuccessful) {
-                    val body = response.body()
+                    val body: LoginResponse? = response.body()
                     Log.d(TAG, "Login successful response body: $body")
                     withContext(Dispatchers.Main) {
                         if (body != null && body.token != null) {
-                            val roleFromServer = when {
-                                try { body::class.members.any { it.name == "getRole" } } catch (e: Exception) { false } -> {
-                                    try {
-                                        val roleProp = body::class.java.getMethod("getRole").invoke(body) as? String
-                                        roleProp ?: "STUDENT"
-                                    } catch (e: Exception) {
-                                        Log.w(TAG, "Reflection role read failed: ${e.message}")
-                                        "STUDENT"
-                                    }
-                                }
-                                else -> {
-                                    try {
-                                        val userField = body::class.java.getDeclaredField("user")
-                                        userField.isAccessible = true
-                                        val userObj = userField.get(body)
-                                        if (userObj != null) {
-                                            val roleField = userObj::class.java.getDeclaredField("role")
-                                            roleField.isAccessible = true
-                                            (roleField.get(userObj) as? String) ?: "STUDENT"
-                                        } else {
-                                            "STUDENT"
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.w(TAG, "user.role read failed: ${e.message}")
-                                        "STUDENT"
-                                    }
-                                }
-                            }
-
-                            saveAuth(body.token!!, roleFromServer)
+                            val roleFromServer = body.role ?: body.user?.role ?: "STUDENT"
+                            saveAuth(body.token, roleFromServer)
                             startRoleActivity(roleFromServer)
                         } else {
                             Toast.makeText(requireContext(), "Неверный ответ сервера", Toast.LENGTH_SHORT).show()
@@ -105,7 +81,7 @@ class LoginFragment : Fragment() {
                     }
                 } else {
                     val code = response.code()
-                    val errBody = try { response.errorBody()?.string() } catch (e: IOException) { "errorBody 읽기 실패: ${e.message}" }
+                    val errBody = try { response.errorBody()?.string() } catch (e: IOException) { "errorBody read failed: ${e.message}" }
                     Log.e(TAG, "Login failed: code=$code, errorBody=$errBody")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "Ошибка входа: $code", Toast.LENGTH_LONG).show()
