@@ -1,6 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">stepwise-mobile</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="app_name">Stepwise</string>
+
+    <string name="title_student">Студент</string>
+    <string name="title_teacher">Преподаватель</string>
+
+    <string name="login_welcome">Добро пожаловать — войдите в систему</string>
+    <string name="hint_username">Логин</string>
+    <string name="hint_password">Пароль</string>
+    <string name="button_login">Войти</string>
+
+    <string name="error_network">Ошибка сети. Повторите попытку позже.</string>
+    <string name="logout">Выйти</string>
+    <string name="forgot_password">Забыли пароль?</string>
 </resources>
