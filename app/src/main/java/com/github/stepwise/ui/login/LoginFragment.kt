@@ -41,7 +41,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.editTextUsername.setText("student")
+        binding.editTextUsername.setText("teacher")
         binding.editTextPassword.setText("Qq@123456")
 
         binding.buttonLogin.setOnClickListener {

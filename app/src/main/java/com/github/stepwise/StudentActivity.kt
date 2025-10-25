@@ -36,7 +36,6 @@ class StudentActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    // Обработка Up (стрелки назад в тулбаре)
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_student)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
