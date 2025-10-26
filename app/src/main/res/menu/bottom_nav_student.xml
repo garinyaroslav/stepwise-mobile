@@ -9,7 +9,7 @@
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="Проекты" />
     <item
-        android:id="@+id/student_profile_fragment"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:id="@+id/profile_fragment"
+        android:icon="@drawable/profile"
         android:title="Профиль" />
 </menu>

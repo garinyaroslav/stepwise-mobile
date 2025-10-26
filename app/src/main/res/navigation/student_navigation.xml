@@ -18,8 +18,11 @@
         tools:layout="@layout/fragment_student_projects" />
 
     <fragment
-        android:id="@+id/student_profile_fragment"
-        android:name="com.github.stepwise.ui.student.StudentProfileFragment"
-        android:label="Profile"
-        tools:layout="@layout/fragment_student_profile" />
+        android:id="@+id/profile_fragment"
+        android:name="com.github.stepwise.ui.profile.ProfileFragment"
+        android:label="Профиль">
+        <argument
+            android:name="userId"
+            app:argType="long" />
+    </fragment>
 </navigation>

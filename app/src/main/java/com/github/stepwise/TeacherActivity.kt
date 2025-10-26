@@ -30,7 +30,7 @@ class TeacherActivity : AppCompatActivity() {
             setOf(
                 R.id.teacher_home_fragment,
                 R.id.teacher_projects_fragment,
-                R.id.teacher_profile_fragment
+                R.id.profile_fragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

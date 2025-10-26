@@ -29,7 +29,7 @@ class StudentActivity : AppCompatActivity() {
             setOf(
                 R.id.student_home_fragment,
                 R.id.student_projects_fragment,
-                R.id.student_profile_fragment
+                R.id.profile_fragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
