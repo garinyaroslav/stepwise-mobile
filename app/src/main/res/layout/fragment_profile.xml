@@ -4,50 +4,40 @@
     android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="0dp"
     android:background="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="16dp"
         android:orientation="vertical">
 
-        <!-- Header -->
-        <TextView
-            android:id="@+id/titleProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginTop="8dp"/>
 
         <TextView
             android:id="@+id/subtitleProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Manage your personal information and security"
+            android:text="Управляйте своей личной информацией и безопасностью"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="?attr/colorOnSurface"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardElevation="0dp"
             android:layout_marginBottom="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="0dp">
 
-                <!-- Avatar row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -81,35 +71,27 @@
                             android:id="@+id/textAccount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="username • email@example.com"
+                            android:text="username • email@mail.com"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                         <TextView
                             android:id="@+id/textRole"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Student"
+                            android:text="Role"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                             android:textColor="?attr/colorPrimary"
                             android:layout_marginTop="4dp"/>
                     </LinearLayout>
 
-                    <Button
-                        android:id="@+id/buttonChangeAvatar"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Change"
-                        android:layout_marginStart="8dp"/>
                 </LinearLayout>
 
-                <!-- Form -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFirstName"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="First name"
+                    android:hint="Имя"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etFirstName"
@@ -122,7 +104,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Last name"
+                    android:hint="Фамилия"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etLastName"
@@ -135,7 +117,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone (+7... or 8...)"
+                    android:hint="Номер телефона (+7... or 8...)"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPhone"
@@ -149,7 +131,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Address / Department"
+                    android:hint="Адрес"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etAddress"
@@ -157,7 +139,6 @@
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -170,14 +151,14 @@
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cancel" />
+                        android:text="Отмена" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonSave"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="Save"
+                        android:text="Сохранить"
                         app:cornerRadius="8dp"
                         app:iconTint="?attr/colorOnPrimary" />
                 </LinearLayout>
@@ -185,23 +166,22 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Security card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="0dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Security"
+                    android:text="Безопасность"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                     android:textStyle="bold"/>
 
@@ -210,7 +190,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Current password"
+                    android:hint="Текущий пароль"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etCurrentPassword"
@@ -224,7 +204,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="New password"
+                    android:hint="Новый пароль"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etNewPassword"
@@ -238,7 +218,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Confirm password"
+                    android:hint="Подтверить пароль"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etConfirmPassword"
@@ -252,7 +232,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Reset password" />
+                    android:text="Сбросить пароль" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -1,6 +1,7 @@
 package com.github.stepwise.ui.profile
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -66,12 +67,14 @@ class ProfileFragment : Fragment() {
                 }
                 if (resp.isSuccessful) {
                     val p = resp.body()
+                    val role = requireActivity().getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE).getString("role", "Student")
                     withContext(Dispatchers.Main) {
+                        binding.textRole.text = role
                         binding.etFirstName.setText(p?.firstName ?: "")
                         binding.etLastName.setText(p?.lastName ?: "")
                         binding.etPhone.setText(p?.phoneNumber ?: "")
                         binding.etAddress.setText(p?.address ?: "")
-                        binding.textAccount.text = "${p?.username ?: ""} • ${p?.email ?: ""}"
+                        binding.textAccount.text = "${p?.username ?: ""}\n${p?.email ?: ""}"
                     }
                 } else {
                     withContext(Dispatchers.Main) {
