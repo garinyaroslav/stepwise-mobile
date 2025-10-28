@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/teacher_home_fragment"
-        android:icon="@android:drawable/ic_menu_view"
-        android:title="Домашняя" />
-    <item
         android:id="@+id/teacher_projects_fragment"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/project_icon"
         android:title="Проекты" />
+    <item
+        android:id="@+id/teacher_home_fragment"
+        android:icon="@drawable/plus_icon"
+        android:title="Создание" />
     <item
         android:id="@+id/profile_fragment"
         android:icon="@drawable/profile"
