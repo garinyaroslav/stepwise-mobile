@@ -1,18 +1,17 @@
 package com.github.stepwise.ui.profile
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.github.stepwise.MainActivity
 import com.github.stepwise.databinding.FragmentProfileBinding
 import com.github.stepwise.network.ApiClient
+import com.github.stepwise.network.AuthInterceptor
 import com.github.stepwise.network.models.ProfileReq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,13 +24,13 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var argUserId: Long = -1L
-// TODO: create logout
-//    fun logout(context: Context) {
-//        val prefs = context.getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE)
-//        prefs.edit().remove("token").remove("role").apply()
-//        context.sendBroadcast(Intent(com.github.stepwise.network.AuthInterceptor.ACTION_LOGOUT))
-//    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            argUserId = it.getLong("userId", -1L)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -45,16 +44,29 @@ class ProfileFragment : Fragment() {
         binding.buttonSave.setOnClickListener { saveProfile() }
         binding.buttonResetPassword.setOnClickListener { Toast.makeText(requireContext(), "Change password on server (not implemented)", Toast.LENGTH_SHORT).show() }
 
+        // New: logout button
+        binding.buttonLogout.setOnClickListener { performLogout() }
+
         loadProfile()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            argUserId = it.getLong("userId", -1L)
-        }
-    }
+    private fun performLogout() {
+        val prefs = requireActivity().getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE)
+        prefs.edit().remove("token").remove("role").apply()
+        val intentLogout = Intent(AuthInterceptor.ACTION_LOGOUT)
+        requireActivity().sendBroadcast(intentLogout)
 
+        val launchIntent = requireActivity().packageManager.getLaunchIntentForPackage(requireActivity().packageName)
+        if (launchIntent != null) {
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(launchIntent)
+        } else {
+            val fallback = Intent(requireContext(), MainActivity::class.java)
+            fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(fallback)
+        }
+        requireActivity().finish()
+    }
     private fun loadProfile() {
         binding.buttonSave.isEnabled = false
         binding.buttonCancel.isEnabled = false

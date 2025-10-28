@@ -84,8 +84,10 @@
                             android:layout_marginTop="4dp"/>
                     </LinearLayout>
 
+                    <!-- NEW: Logout button -->
                 </LinearLayout>
 
+                <!-- rest of form omitted for brevity (keeps same as before) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFirstName"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -166,6 +168,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Security card remains unchanged -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -233,6 +236,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="Сбросить пароль" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonLogout"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Выйти" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
