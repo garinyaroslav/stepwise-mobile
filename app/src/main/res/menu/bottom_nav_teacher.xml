@@ -5,7 +5,7 @@
         android:icon="@drawable/project_icon"
         android:title="Проекты" />
     <item
-        android:id="@+id/teacher_home_fragment"
+        android:id="@+id/teacher_creation_fragment"
         android:icon="@drawable/plus_icon"
         android:title="Создание" />
     <item

@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/teacher_navigation"
-    app:startDestination="@id/teacher_home_fragment">
+    app:startDestination="@id/teacher_projects_fragment">
 
     <fragment
-        android:id="@+id/teacher_home_fragment"
-        android:name="com.github.stepwise.ui.teacher.TeacherHomeFragment"
+        android:id="@+id/teacher_creation_fragment"
+        android:name="com.github.stepwise.ui.teacher.TeacherCreationFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_teacher_home" />
+        tools:layout="@layout/fragment_teacher_creation" />
 
     <fragment
         android:id="@+id/teacher_projects_fragment"

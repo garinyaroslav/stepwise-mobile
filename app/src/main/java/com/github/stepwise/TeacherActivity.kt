@@ -28,7 +28,7 @@ class TeacherActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_teacher)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.teacher_home_fragment,
+                R.id.teacher_creation_fragment,
                 R.id.teacher_projects_fragment,
                 R.id.profile_fragment
             )
