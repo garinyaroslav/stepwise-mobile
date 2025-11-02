@@ -44,7 +44,6 @@ class ProfileFragment : Fragment() {
         binding.buttonSave.setOnClickListener { saveProfile() }
         binding.buttonResetPassword.setOnClickListener { Toast.makeText(requireContext(), "Change password on server (not implemented)", Toast.LENGTH_SHORT).show() }
 
-        // New: logout button
         binding.buttonLogout.setOnClickListener { performLogout() }
 
         loadProfile()

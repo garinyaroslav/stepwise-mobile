@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/teacher_creation_fragment"
-        android:name="com.github.stepwise.ui.teacher.TeacherCreationFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_teacher_creation" />
+        android:name="com.github.stepwise.ui.work.CreateWorkFragment"
+        android:label="Создать учебную работу"
+        tools:layout="@layout/fragment_create_work" />
 
     <fragment
         android:id="@+id/teacher_projects_fragment"

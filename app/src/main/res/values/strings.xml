@@ -13,4 +13,9 @@
     <string name="error_network">Ошибка сети. Повторите попытку позже.</string>
     <string name="logout">Выйти</string>
     <string name="forgot_password">Забыли пароль?</string>
+
+    <string name="spinner_type_hint">Тип работы</string>
+    <string name="spinner_type_coursework_desc">Курсовая работа</string>
+    <string name="spinner_type_thesis_desc">Дипломная работа</string>
+    <string name="spinner_icon_desc">Icon</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.github.stepwise.network
 
+import com.github.stepwise.network.models.CreateWorkReq
 import com.github.stepwise.network.models.LoginRequest
 import com.github.stepwise.network.models.LoginResponse
 import com.github.stepwise.network.models.ProfileReq
@@ -19,4 +20,7 @@ interface ApiService {
 
     @PUT("user/profile")
     suspend fun updateProfile(@Body profile: ProfileReq): Response<ProfileRes>
+
+    @POST("work")
+    suspend fun createWork(@Body work: CreateWorkReq): Response<Void>
 }
