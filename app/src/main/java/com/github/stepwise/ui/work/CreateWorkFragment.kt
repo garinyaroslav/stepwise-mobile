@@ -9,10 +9,8 @@ import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatSpinner
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.stepwise.R
 import com.github.stepwise.databinding.FragmentCreateWorkBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.CreateWorkReq
@@ -70,6 +68,22 @@ class CreateWorkFragment : Fragment() {
 
         binding.buttonSaveWork.setOnClickListener {
             submitWork()
+        }
+        binding.etGroupId.apply {
+            isFocusable = false
+            isClickable = true
+            isLongClickable = false
+            setOnClickListener {
+                val dlg = GroupSearchDialog()
+                dlg.show(parentFragmentManager, "group_search")
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener("group_selected", viewLifecycleOwner) { _, bundle ->
+            val gid = bundle.getLong("groupId")
+            val gname = bundle.getString("groupName") ?: gid.toString()
+            binding.etGroupId.setText(gname)
+            binding.etGroupId.tag = gid
         }
     }
 
@@ -135,27 +149,16 @@ class CreateWorkFragment : Fragment() {
 
         val typeEnum = typeValues.getOrNull(selectedTypeIndex) ?: ProjectType.COURSEWORK
 
-        val groupIdText = binding.etGroupId.text?.toString()?.trim().orEmpty()
+        val groupId = (binding.etGroupId.tag as? Long) ?: run {
+            binding.tilGroupId.error = "Выберите группу"
+            return
+        }
 
         if (title.length < 3) {
             binding.tilWorkTitle.error = "Введите название (мин. 3 символа)"
             return
         } else {
             binding.tilWorkTitle.error = null
-        }
-
-        if (groupIdText.isBlank()) {
-            binding.tilGroupId.error = "Укажите Group ID"
-            return
-        } else {
-            binding.tilGroupId.error = null
-        }
-
-        val groupId = try {
-            groupIdText.toLong()
-        } catch (e: Exception) {
-            binding.tilGroupId.error = "Неверный Group ID"
-            return
         }
 
         if (chapterStates.isEmpty()) {
