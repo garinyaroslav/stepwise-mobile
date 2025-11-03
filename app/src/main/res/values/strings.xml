@@ -23,4 +23,5 @@
     <string name="enter_search_query">Введите запрос для поиска</string>
     <string name="error_loading_groups">Ошибка при загрузке групп</string>
     <string name="select_group">Выберите группу</string>
+    <string name="not_set">Не задан</string>
 </resources>
