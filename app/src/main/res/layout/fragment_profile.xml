@@ -50,14 +50,14 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         app:cardCornerRadius="40dp"
-                        app:cardElevation="2dp">
+                        app:cardElevation="0dp">
 
                         <ImageView
                             android:id="@+id/imageAvatar"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            app:srcCompat="@drawable/ic_avatar_placeholder" />
+                            app:srcCompat="@drawable/avatar" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout

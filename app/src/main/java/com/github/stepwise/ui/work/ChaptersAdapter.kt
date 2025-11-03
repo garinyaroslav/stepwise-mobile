@@ -1,14 +1,19 @@
 package com.github.stepwise.ui.work
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.card.MaterialCardView
 import com.github.stepwise.R
 import com.github.stepwise.network.models.WorkChapterReq
 
@@ -25,6 +30,7 @@ class ChaptersAdapter(
     )
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
+        val card: MaterialCardView = view.findViewById(R.id.cardChapter)
         val indexText: TextView = view.findViewById(R.id.textChapterIndex)
         val etTitle: TextInputEditText = view.findViewById(R.id.etChapterTitle)
         val etDescription: TextInputEditText = view.findViewById(R.id.etChapterDescription)
@@ -35,6 +41,17 @@ class ChaptersAdapter(
         var titleWatcher: TextWatcher? = null
         var descWatcher: TextWatcher? = null
     }
+
+    private val palette = listOf(
+        Color.parseColor("#FFCDD2"),
+        Color.parseColor("#F8BBD0"),
+        Color.parseColor("#E1BEE7"),
+        Color.parseColor("#C5CAE9"),
+        Color.parseColor("#BBDEFB"),
+        Color.parseColor("#B2EBF2"),
+        Color.parseColor("#C8E6C9"),
+        Color.parseColor("#FFE0B2")
+    )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_work_chapter, parent, false)
@@ -73,13 +90,20 @@ class ChaptersAdapter(
         holder.etDescription.addTextChangedListener(newDescWatcher)
         holder.descWatcher = newDescWatcher
 
-        holder.btnRemove.setOnClickListener {
-            onRemove(position)
+        val color = palette[position % palette.size]
+        val circle = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(color)
         }
 
-        holder.btnPick.setOnClickListener {
-            onPickDate(position)
-        }
+        try {
+            val strokeColor = ColorUtils.blendARGB(color, Color.BLACK, 0.15f)
+            holder.card.strokeColor = strokeColor
+            holder.card.strokeWidth = 2
+        } catch (_: Exception) {}
+
+        holder.btnRemove.setOnClickListener { onRemove(position) }
+        holder.btnPick.setOnClickListener { onPickDate(position) }
     }
 
     override fun getItemCount(): Int = items.size

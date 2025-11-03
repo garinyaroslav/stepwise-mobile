@@ -80,7 +80,7 @@ class ProfileFragment : Fragment() {
                     val p = resp.body()
                     val role = requireActivity().getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE).getString("role", "Student")
                     withContext(Dispatchers.Main) {
-                        binding.textRole.text = role
+                        binding.textRole.text = if (role == "STUDENT") "Студент" else "Преподаватель"
                         binding.etFirstName.setText(p?.firstName ?: "")
                         binding.etLastName.setText(p?.lastName ?: "")
                         binding.etPhone.setText(p?.phoneNumber ?: "")

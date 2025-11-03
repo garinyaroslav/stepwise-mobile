@@ -1,22 +1,27 @@
 package com.github.stepwise.ui.work
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.stepwise.R
 import com.github.stepwise.databinding.FragmentCreateWorkBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.CreateWorkReq
 import com.github.stepwise.network.models.ProjectType
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -93,8 +98,8 @@ class CreateWorkFragment : Fragment() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         val icons = intArrayOf(
-            android.R.drawable.ic_menu_edit,
-            android.R.drawable.ic_menu_agenda
+            R.drawable.pen,
+            R.drawable.work
         )
         val typeAdapter = TypeSpinnerAdapter(requireContext(), typeDisplay, icons)
         spinner.adapter = typeAdapter
@@ -143,6 +148,14 @@ class CreateWorkFragment : Fragment() {
         dp.show()
     }
 
+    private fun hideKeyboardSilently() {
+        try {
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(binding.root.windowToken, 0)
+        } catch (e: Exception) {
+        }
+    }
+
     private fun submitWork() {
         val title = binding.etWorkTitle.text?.toString()?.trim().orEmpty()
         val description = binding.etWorkDescription.text?.toString()?.trim().orEmpty()
@@ -178,11 +191,13 @@ class CreateWorkFragment : Fragment() {
         }
 
         binding.buttonSaveWork.isEnabled = false
-        CoroutineScope(Dispatchers.IO).launch {
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val profileResp = ApiClient.apiService.getMyProfile()
                 if (!profileResp.isSuccessful) {
                     withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
                         binding.buttonSaveWork.isEnabled = true
                         Toast.makeText(requireContext(), "Не удалось получить профиль: ${profileResp.code()}", Toast.LENGTH_SHORT).show()
                     }
@@ -192,6 +207,7 @@ class CreateWorkFragment : Fragment() {
                 val teacherId = profile?.id
                 if (teacherId == null) {
                     withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
                         binding.buttonSaveWork.isEnabled = true
                         Toast.makeText(requireContext(), "Не удалось получить id преподавателя", Toast.LENGTH_SHORT).show()
                     }
@@ -209,19 +225,36 @@ class CreateWorkFragment : Fragment() {
                 )
 
                 val resp = ApiClient.apiService.createWork(req)
+
                 withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+
                     binding.buttonSaveWork.isEnabled = true
                     if (resp.isSuccessful) {
                         Toast.makeText(requireContext(), "Работа успешно создана", Toast.LENGTH_SHORT).show()
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
+
+                        hideKeyboardSilently()
+
+                        launch {
+                            try {
+                                delay(120)
+                                try {
+                                    findNavController().popBackStack()
+                                } catch (navEx: Exception) {
+                                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
                     } else {
                         Toast.makeText(requireContext(), "Ошибка создания: ${resp.code()}", Toast.LENGTH_SHORT).show()
                     }
                 }
-
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
                     binding.buttonSaveWork.isEnabled = true
                     Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 }
