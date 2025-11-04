@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/teacher_projects_fragment"
         android:name="com.github.stepwise.ui.teacher.TeacherProjectsFragment"
-        android:label="Projects"
+        android:label="Проекты по группам"
         tools:layout="@layout/fragment_teacher_projects" />
 
     <fragment

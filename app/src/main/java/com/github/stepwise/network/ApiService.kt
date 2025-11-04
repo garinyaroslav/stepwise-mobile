@@ -6,11 +6,13 @@ import com.github.stepwise.network.models.LoginRequest
 import com.github.stepwise.network.models.LoginResponse
 import com.github.stepwise.network.models.ProfileReq
 import com.github.stepwise.network.models.ProfileRes
+import com.github.stepwise.network.models.WorkResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -28,4 +30,7 @@ interface ApiService {
 
     @GET("group")
     suspend fun getAllGroups(@Query("search") search: String?): Response<List<GroupResponseDto>>
+
+    @GET("work/teacher/{teacherId}")
+    suspend fun getWorksByTeacherId(@Path("teacherId") teacherId: Long, @Query("groupId") groupId: Long?): Response<List<WorkResponseDto>>
 }
