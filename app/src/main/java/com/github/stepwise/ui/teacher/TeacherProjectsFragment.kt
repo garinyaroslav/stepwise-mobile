@@ -36,7 +36,6 @@ class TeacherProjectsFragment : Fragment() {
 
         adapter = WorksAdapter(
             onOpen = { work -> openWork(work) },
-            onEdit = { work -> editWork(work) }
         )
 
         binding.rvWorks.layoutManager = LinearLayoutManager(requireContext())

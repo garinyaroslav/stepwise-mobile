@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-28T17:33:20.454519570Z">
+        <DropdownSelection timestamp="2025-11-05T17:06:08.897462115Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RZ8RC1JJ4MK" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/garin/.android/avd/Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>

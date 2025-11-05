@@ -12,11 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.stepwise.R
 import com.github.stepwise.network.models.WorkResponseDto
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.button.MaterialButton
 
 class WorksAdapter(
     private val onOpen: (WorkResponseDto) -> Unit,
-    private val onEdit: (WorkResponseDto) -> Unit
 ) : ListAdapter<WorkResponseDto, WorksAdapter.VH>(DIFF) {
 
     companion object {
@@ -38,7 +36,6 @@ class WorksAdapter(
         val ivExpand: ImageView = itemView.findViewById(R.id.ivExpand)
         val expandedArea: View = itemView.findViewById(R.id.expandedArea)
         val tvDescription: TextView = itemView.findViewById(R.id.tvWorkDescription)
-        val btnEdit: MaterialButton = itemView.findViewById(R.id.btnEditWork)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -50,8 +47,8 @@ class WorksAdapter(
         val work = getItem(position)
 
         holder.tvTitle.text = work.title
-        val teacherName = listOfNotNull(work.teacherFirstName, work.teacherLastName, work.teacherMiddleName).joinToString(" ")
-        val meta = "${work.groupName} ${teacherName.ifBlank { work.teacherEmail }} Частей: ${work.countOfChapters}"
+        val typeOfWork = if (work.type == "COURSEWORK") "Курсовая работа" else "Дипломная работа"
+        val meta = "${typeOfWork} у группы ${work.groupName}. Пунктов: ${work.countOfChapters}"
         holder.tvMeta.text = meta
 
         holder.tvDescription.text = work.description ?: ""
@@ -65,8 +62,6 @@ class WorksAdapter(
         holder.ivExpand.setOnClickListener {
             toggleExpansion(work.id, holder)
         }
-
-        holder.btnEdit.setOnClickListener { onEdit(work) }
     }
 
     private fun toggleExpansion(id: Long, holder: VH) {

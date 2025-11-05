@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.github.stepwise.MainActivity
 import com.github.stepwise.databinding.FragmentProfileBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.AuthInterceptor
 import com.github.stepwise.network.models.ProfileReq
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,10 +66,13 @@ class ProfileFragment : Fragment() {
         }
         requireActivity().finish()
     }
+
     private fun loadProfile() {
         binding.buttonSave.isEnabled = false
         binding.buttonCancel.isEnabled = false
-        CoroutineScope(Dispatchers.IO).launch {
+
+        // lifecycleScope so coroutine cancels with view lifecycle
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val resp = ApiClient.apiService.getMyProfile()
                 withContext(Dispatchers.Main) {
@@ -82,6 +85,7 @@ class ProfileFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         binding.textRole.text = if (role == "STUDENT") "Студент" else "Преподаватель"
                         binding.etFirstName.setText(p?.firstName ?: "")
+                        binding.etMiddleName.setText(p?.middleName ?: "")
                         binding.etLastName.setText(p?.lastName ?: "")
                         binding.etPhone.setText(p?.phoneNumber ?: "")
                         binding.etAddress.setText(p?.address ?: "")
@@ -103,6 +107,7 @@ class ProfileFragment : Fragment() {
 
     private fun saveProfile() {
         val first = binding.etFirstName.text?.toString()?.trim() ?: ""
+        val middle = binding.etMiddleName.text?.toString()?.trim() ?: ""
         val last = binding.etLastName.text?.toString()?.trim() ?: ""
         val phone = binding.etPhone.text?.toString()?.trim() ?: ""
         val address = binding.etAddress.text?.toString()?.trim() ?: ""
@@ -116,9 +121,10 @@ class ProfileFragment : Fragment() {
         binding.tilPhone.error = null
 
         binding.buttonSave.isEnabled = false
-        CoroutineScope(Dispatchers.IO).launch {
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val dto = ProfileReq(id = null, firstName = first, lastName = last, phoneNumber = phone, address = address)
+                val dto = ProfileReq(id = null, firstName = first, lastName = last, middleName = if (middle.isBlank()) null else middle, phoneNumber = phone, address = address)
                 val resp = ApiClient.apiService.updateProfile(dto)
                 withContext(Dispatchers.Main) {
                     binding.buttonSave.isEnabled = true
