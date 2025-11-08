@@ -11,4 +11,6 @@
         android:label="Login"
         tools:layout="@layout/fragment_login" />
 
+    <include app:graph="@navigation/teacher_navigation" />
+
 </navigation>

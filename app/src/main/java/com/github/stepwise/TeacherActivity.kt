@@ -10,7 +10,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.github.stepwise.databinding.ActivityTeacherBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-
 class TeacherActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTeacherBinding
@@ -18,6 +17,7 @@ class TeacherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityTeacherBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -26,19 +26,21 @@ class TeacherActivity : AppCompatActivity() {
         val navView: BottomNavigationView = binding.navViewTeacher
 
         val navController = findNavController(R.id.nav_host_fragment_teacher)
-        val appBarConfiguration = AppBarConfiguration(
+
+        appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.teacher_creation_fragment,
                 R.id.teacher_projects_fragment,
                 R.id.profile_fragment
             )
         )
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_student)
+        val navController = findNavController(R.id.nav_host_fragment_teacher)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

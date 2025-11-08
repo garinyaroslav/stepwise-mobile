@@ -6,16 +6,31 @@
     app:startDestination="@id/teacher_projects_fragment">
 
     <fragment
-        android:id="@+id/teacher_creation_fragment"
-        android:name="com.github.stepwise.ui.work.CreateWorkFragment"
-        android:label="Создать учебную работу"
-        tools:layout="@layout/fragment_create_work" />
+        android:id="@+id/work_detail_fragment"
+        android:name="com.github.stepwise.ui.teacher.WorkDetailFragment"
+        android:label="Детали работы"
+        tools:layout="@layout/fragment_work_detail">
+        <argument
+            android:name="workId"
+            app:argType="long" />
+    </fragment>
 
     <fragment
         android:id="@+id/teacher_projects_fragment"
         android:name="com.github.stepwise.ui.teacher.TeacherProjectsFragment"
         android:label="Проекты по группам"
-        tools:layout="@layout/fragment_teacher_projects" />
+        tools:layout="@layout/fragment_teacher_projects">
+
+        <action
+            android:id="@+id/action_teacher_projects_to_work_detail"
+            app:destination="@id/work_detail_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/teacher_creation_fragment"
+        android:name="com.github.stepwise.ui.work.CreateWorkFragment"
+        android:label="Создать учебную работу"
+        tools:layout="@layout/fragment_create_work" />
 
     <fragment
         android:id="@+id/profile_fragment"

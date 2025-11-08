@@ -1,13 +1,17 @@
 package com.github.stepwise.ui.teacher
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.stepwise.R
 import com.github.stepwise.databinding.FragmentTeacherProjectsBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.WorkResponseDto
@@ -15,7 +19,6 @@ import com.github.stepwise.ui.work.GroupSearchDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 class TeacherProjectsFragment : Fragment() {
 
@@ -65,7 +68,6 @@ class TeacherProjectsFragment : Fragment() {
             showLoading(true)
             loadWorks()
         }
-
 
         showLoading(true)
         loadWorks()
@@ -129,30 +131,22 @@ class TeacherProjectsFragment : Fragment() {
         }
     }
 
-    private fun filter(q: String) {
-        val ql = q.trim().lowercase(Locale.getDefault())
-        val filtered = if (ql.isEmpty()) {
-            allWorks
-        } else {
-            allWorks.filter {
-                (it.title?.lowercase(Locale.getDefault())?.contains(ql) == true) ||
-                        (it.groupName?.lowercase(Locale.getDefault())?.contains(ql) == true)
-            }
-        }
-        adapter.submitList(filtered)
-        binding.tvEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
-    }
-
     private fun openWork(work: WorkResponseDto) {
-        Toast.makeText(requireContext(), "Открыть: ${work.title}", Toast.LENGTH_SHORT).show()
-    }
+        val wid = work.id ?: run {
+            Toast.makeText(requireContext(), "У работы нет id", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-    private fun editWork(work: WorkResponseDto) {
-        Toast.makeText(requireContext(), "Редактировать: ${work.title}", Toast.LENGTH_SHORT).show()
-    }
+        val nav = findNavController()
+        Log.d("NAV", "before navigate - current=${nav.currentDestination?.label} prev=${nav.previousBackStackEntry?.destination?.label}")
 
-    private fun createNewWork() {
-        Toast.makeText(requireContext(), "Создать новую работу", Toast.LENGTH_SHORT).show()
+        val bundle = bundleOf("workId" to wid)
+        nav.navigate(R.id.work_detail_fragment, bundle)
+
+        view?.post {
+            val navAfter = findNavController()
+            Log.d("NAV", "after navigate - current=${navAfter.currentDestination?.label} prev=${navAfter.previousBackStackEntry?.destination?.label}")
+        }
     }
 
     override fun onDestroyView() {

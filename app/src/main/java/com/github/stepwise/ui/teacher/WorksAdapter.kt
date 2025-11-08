@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.stepwise.R
+import com.github.stepwise.network.models.ProjectType
 import com.github.stepwise.network.models.WorkResponseDto
 import com.google.android.material.card.MaterialCardView
 
@@ -47,7 +48,7 @@ class WorksAdapter(
         val work = getItem(position)
 
         holder.tvTitle.text = work.title
-        val typeOfWork = if (work.type == "COURSEWORK") "Курсовая работа" else "Дипломная работа"
+        val typeOfWork = if (work.type == ProjectType.COURSEWORK) "Курсовая работа" else "Дипломная работа"
         val meta = "${typeOfWork} у группы ${work.groupName}. Пунктов: ${work.countOfChapters}"
         holder.tvMeta.text = meta
 
@@ -64,13 +65,15 @@ class WorksAdapter(
         }
     }
 
-    private fun toggleExpansion(id: Long, holder: VH) {
+    private fun toggleExpansion(id: Long?, holder: VH) {
         if (expanded.contains(id)) {
             expanded.remove(id)
             animateExpandIcon(holder.ivExpand, false)
             holder.expandedArea.visibility = View.GONE
         } else {
-            expanded.add(id)
+            if (id != null) {
+                expanded.add(id)
+            }
             animateExpandIcon(holder.ivExpand, true)
             holder.expandedArea.visibility = View.VISIBLE
         }
