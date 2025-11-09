@@ -11,8 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.stepwise.databinding.FragmentWorkDetailBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.ProjectResponseDto
+import com.github.stepwise.network.models.ProjectType
+import com.github.stepwise.network.models.WorkChapterDto
 import com.github.stepwise.network.models.WorkResponseDto
-import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,6 +24,7 @@ class WorkDetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var projectsAdapter: StudentsProjectsAdapter
+    private lateinit var chaptersAdapter: ChaptersAdapter
     private var currentWork: WorkResponseDto? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -39,6 +41,11 @@ class WorkDetailFragment : Fragment() {
         }
         binding.rvProjects.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProjects.adapter = projectsAdapter
+
+        chaptersAdapter = ChaptersAdapter()
+        binding.rvChapters.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvChapters.adapter = chaptersAdapter
+        binding.rvChapters.isNestedScrollingEnabled = false
 
         binding.fabRefresh.setOnClickListener {
             loadWork()
@@ -96,24 +103,21 @@ class WorkDetailFragment : Fragment() {
 
     private fun renderWork(work: WorkResponseDto?) {
         if (work == null) return
+
         binding.tvTitle.text = work.title ?: ""
         binding.tvDescription.text = work.description ?: ""
-        binding.tvMeta.text = "${work.groupName ?: ""} · ${work.teacherName ?: work.teacherEmail ?: ""} · ${work.countOfChapters ?: 0} частей"
 
-        binding.chaptersContainer.removeAllViews()
-        val chapters = work.academicWorkChapters
-        if (chapters.isNullOrEmpty()) {
-            val chip = Chip(requireContext())
-            chip.text = "Нет настроенных пунктов"
-            chip.isClickable = false
-            binding.chaptersContainer.addView(chip)
+        val typeOfWork = if (work.type == ProjectType.COURSEWORK) "Курсовая работа" else "Дипломная работа"
+        binding.tvMeta.text = "${typeOfWork} у группы ${work.groupName}. Пунктов: ${work.countOfChapters ?: 0}"
+
+        val chapters: List<WorkChapterDto> = work.academicWorkChapters ?: emptyList()
+        if (chapters.isEmpty()) {
+            binding.tvChaptersEmpty.visibility = View.VISIBLE
+            binding.rvChapters.visibility = View.GONE
         } else {
-            for (ch in chapters) {
-                val chip = Chip(requireContext())
-                chip.text = ch.title ?: "Пункт"
-                chip.isClickable = false
-                binding.chaptersContainer.addView(chip)
-            }
+            binding.tvChaptersEmpty.visibility = View.GONE
+            binding.rvChapters.visibility = View.VISIBLE
+            chaptersAdapter.submitList(chapters)
         }
     }
 

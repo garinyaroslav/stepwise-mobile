@@ -7,9 +7,11 @@
     android:padding="12dp"
     android:background="?attr/colorSurface">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                app:cardElevation="0dp"
                 android:padding="12dp">
 
                 <LinearLayout
@@ -51,20 +53,32 @@
                         android:layout_marginTop="8dp"
                         android:textAppearance="?attr/textAppearanceBody2" />
 
+                    <!-- Chapters header -->
                     <TextView
+                        android:id="@+id/tvChaptersHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Пункты пояснительной записки"
                         android:layout_marginTop="12dp"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chaptersContainer"
+                    <!-- Recycler for chapters -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvChapters"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvChaptersEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Нет настроенных пунктов"
+                        android:visibility="gone"
                         android:layout_marginTop="8dp"
-                        app:singleLine="false"
-                        app:chipSpacing="8dp" />
+                        android:textAppearance="?attr/textAppearanceBody2" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -83,7 +97,7 @@
                 android:layout_marginTop="8dp" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabRefresh"

@@ -138,15 +138,9 @@ class TeacherProjectsFragment : Fragment() {
         }
 
         val nav = findNavController()
-        Log.d("NAV", "before navigate - current=${nav.currentDestination?.label} prev=${nav.previousBackStackEntry?.destination?.label}")
 
         val bundle = bundleOf("workId" to wid)
         nav.navigate(R.id.work_detail_fragment, bundle)
-
-        view?.post {
-            val navAfter = findNavController()
-            Log.d("NAV", "after navigate - current=${navAfter.currentDestination?.label} prev=${navAfter.previousBackStackEntry?.destination?.label}")
-        }
     }
 
     override fun onDestroyView() {
