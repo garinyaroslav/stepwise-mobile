@@ -198,48 +198,6 @@
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                     android:textStyle="bold"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilCurrentPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Текущий пароль"
-                    android:layout_marginTop="8dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etCurrentPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilNewPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Новый пароль"
-                    android:layout_marginTop="8dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etNewPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilConfirmPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Подтверить пароль"
-                    android:layout_marginTop="8dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etConfirmPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonResetPassword"
                     android:layout_width="match_parent"

@@ -1,5 +1,6 @@
 package com.github.stepwise.network
 
+import android.R
 import com.github.stepwise.network.models.CreateWorkReq
 import com.github.stepwise.network.models.GroupResponseDto
 import com.github.stepwise.network.models.LoginRequest
@@ -8,6 +9,7 @@ import com.github.stepwise.network.models.ProfileReq
 import com.github.stepwise.network.models.ProfileRes
 import com.github.stepwise.network.models.ProjectResponseDto
 import com.github.stepwise.network.models.RejectItemDto
+import com.github.stepwise.network.models.ResetPasswordDto
 import com.github.stepwise.network.models.UpdateProjectDto
 import com.github.stepwise.network.models.WorkResponseDto
 import okhttp3.MultipartBody
@@ -79,4 +81,10 @@ interface ApiService {
 
     @POST("explanatory-note-item/submit/{id}")
     suspend fun submitExplanatoryNoteItem(@Path("id") id: Long): Response<Void>
+
+    @POST("auth/password/reset-request")
+    suspend fun requestPasswordReset(@Query("email") email: String): Response<Void>
+
+    @POST("auth/password/reset")
+    suspend fun resetPassword(@Body redDto: ResetPasswordDto): Response<Void>
 }
