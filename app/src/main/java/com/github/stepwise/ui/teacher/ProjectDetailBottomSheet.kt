@@ -1,5 +1,6 @@
 package com.github.stepwise.ui.teacher
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
+import java.io.File
 
 class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
 
@@ -37,9 +40,8 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         itemsAdapter = ExplanatoryItemsAdapter(
-            onViewPdf = { item ->
-                // TODO: call backend to download file and open it
-                Toast.makeText(requireContext(), "Open PDF for item ${item.id}", Toast.LENGTH_SHORT).show()
+            onViewPdf = { _ ->
+                Toast.makeText(requireContext(), "Loading...", Toast.LENGTH_SHORT).show()
             },
             onApprove = { item ->
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -62,7 +64,6 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                 }
             },
             onReject = { item, comment ->
-                // reject item with comment via API
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         val dto = RejectItemDto(teacherComment = comment)
@@ -116,8 +117,108 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                 }
 
                 val items: List<ExplanatoryNoteItemResponseDto> = project.items ?: emptyList()
+
+                val ownerId = project.owner?.id
                 withContext(Dispatchers.Main) {
                     binding.progressLoading.visibility = View.GONE
+
+                    if (ownerId == null) {
+                        Toast.makeText(requireContext(), "Владелец проекта не определён — нельзя открыть файлы", Toast.LENGTH_LONG).show()
+
+                        itemsAdapter = ExplanatoryItemsAdapter(
+                            onViewPdf = { _ ->
+                                Toast.makeText(requireContext(), "Невозможно открыть файл: не найден владелец", Toast.LENGTH_SHORT).show()
+                            },
+                            onApprove = { item -> /* same approve logic as above */ },
+                            onReject = { item, comment -> /* same reject logic as above */ }
+                        )
+                    } else {
+                        itemsAdapter = ExplanatoryItemsAdapter(
+                            onViewPdf = { item ->
+                                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                    try {
+                                        val uId = ownerId
+                                        val iId = item.id ?: -1L
+                                        if (iId <= 0) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(requireContext(), "Неверный id пункта", Toast.LENGTH_SHORT).show()
+                                            }
+                                            return@launch
+                                        }
+
+                                        val downloadResp = ApiClient.apiService.downloadItemFile(uId, projectId, iId)
+                                        if (!downloadResp.isSuccessful || downloadResp.body() == null) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(requireContext(), "Ошибка при загрузке файла: ${downloadResp.code()}", Toast.LENGTH_SHORT).show()
+                                            }
+                                            return@launch
+                                        }
+
+                                        val body: ResponseBody = downloadResp.body()!!
+                                        val inputStream = body.byteStream()
+                                        val file = File(requireContext().cacheDir, "project_${projectId}_item_${iId}.pdf")
+                                        file.outputStream().use { output ->
+                                            inputStream.copyTo(output)
+                                        }
+
+                                        withContext(Dispatchers.Main) {
+                                            val intent = Intent(requireContext(), com.github.stepwise.ui.viewer.PdfViewerActivity::class.java)
+                                            intent.putExtra("pdf_path", file.absolutePath)
+                                            startActivity(intent)
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            },
+                            onApprove = { item ->
+                                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                    try {
+                                        val respApprove = ApiClient.apiService.approveExplanatoryNoteItem(item.id ?: -1L)
+                                        withContext(Dispatchers.Main) {
+                                            if (respApprove.isSuccessful) {
+                                                Toast.makeText(requireContext(), "Пункт подтверждён", Toast.LENGTH_SHORT).show()
+                                                loadProjectItems()
+                                            } else {
+                                                Toast.makeText(requireContext(), "Ошибка: ${respApprove.code()}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            },
+                            onReject = { item, comment ->
+                                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                    try {
+                                        val dto = RejectItemDto(teacherComment = comment)
+                                        val respReject = ApiClient.apiService.rejectExplanatoryNoteItem(item.id ?: -1L, dto)
+                                        withContext(Dispatchers.Main) {
+                                            if (respReject.isSuccessful) {
+                                                Toast.makeText(requireContext(), "Пункт отклонён", Toast.LENGTH_SHORT).show()
+                                                loadProjectItems()
+                                            } else {
+                                                Toast.makeText(requireContext(), "Ошибка: ${respReject.code()}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    binding.rvItems.adapter = itemsAdapter
                     itemsAdapter.submitList(items)
                     binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
                 }

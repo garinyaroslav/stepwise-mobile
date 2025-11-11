@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.android.pdf.viewer)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)

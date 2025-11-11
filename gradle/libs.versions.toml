@@ -17,7 +17,8 @@ okhttp = "4.9.3"
 gson = "2.10.1"
 coroutines = "1.6.4"
 security_crypto = "1.1.0"
-
+androidPdfViewer = "3.2.0-beta.3"
+pdfium = "1.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,8 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security_crypto" }
+android-pdf-viewer = { group = "com.github.mhiew", name = "android-pdf-viewer", version.ref = "androidPdfViewer" }
+pdfium-android = { group = "com.github.barteksc", name = "pdfium-android", version.ref = "pdfium" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
