@@ -18,6 +18,9 @@ android {
     }
 
     buildTypes {
+        buildFeatures {
+            viewBinding = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -40,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.android.pdf.viewer)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)

@@ -1,0 +1,254 @@
+package com.github.stepwise.ui.student
+
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.OpenableColumns
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.stepwise.databinding.FragmentStudentProjectDetailBinding
+import com.github.stepwise.network.ApiClient
+import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
+import com.github.stepwise.network.models.ProjectResponseDto
+import com.github.stepwise.network.models.WorkChapterDto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.io.InputStream
+
+class StudentProjectDetailFragment : Fragment() {
+
+    private var _binding: FragmentStudentProjectDetailBinding? = null
+    private val binding get() = _binding!!
+
+    private var workId: Long = -1L
+    private var project: ProjectResponseDto? = null
+    private var chapters: List<WorkChapterDto> = emptyList()
+    private var items: List<ExplanatoryNoteItemResponseDto> = emptyList()
+
+    private lateinit var chaptersAdapter: ProjectChaptersAdapter
+
+    private var pendingChapterIndex: Int = -1
+
+    private val pickPdf = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != Activity.RESULT_OK) {
+            return@registerForActivityResult
+        }
+        val data: Intent? = result.data
+        val uri: Uri? = data?.data
+        if (uri != null) {
+            uploadFileForChapter(uri, pendingChapterIndex)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        workId = arguments?.getLong("workId", -1L) ?: -1L
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentStudentProjectDetailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        chaptersAdapter = ProjectChaptersAdapter(
+            onAttach = { chapterIndex -> onAttachClicked(chapterIndex) },
+            onView = { item -> openPdfForItem(item) }
+        )
+        binding.rvChapters.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvChapters.adapter = chaptersAdapter
+
+        binding.swipeRefresh.setOnRefreshListener { loadData() }
+
+        loadData()
+    }
+
+    private fun loadData() {
+        binding.swipeRefresh.isRefreshing = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val workResp = ApiClient.apiService.getWorkById(workId)
+                if (!workResp.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        binding.swipeRefresh.isRefreshing = false
+                        Toast.makeText(requireContext(), "Ошибка загрузки работы: ${workResp.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+                val work = workResp.body()
+
+                val pResp = ApiClient.apiService.getProjectsByWork(workId)
+                if (!pResp.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        binding.swipeRefresh.isRefreshing = false
+                        Toast.makeText(requireContext(), "Ошибка загрузки проекта: ${pResp.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+                val projects = pResp.body() ?: emptyList()
+                val projectDto = if (projects.isNotEmpty()) projects[0] else null
+
+                withContext(Dispatchers.Main) {
+                    binding.swipeRefresh.isRefreshing = false
+                    if (work == null) {
+                        Toast.makeText(requireContext(), "Работа не найдена", Toast.LENGTH_SHORT).show()
+                        return@withContext
+                    }
+                    chapters = work.academicWorkChapters ?: emptyList()
+                    project = projectDto
+                    items = projectDto?.items ?: emptyList()
+
+                    renderHeader(work.title ?: "", projectDto)
+                    val display = chapters.map { ch ->
+                        val item = items.find { it.orderNumber == ch.index }
+                        Pair(ch, item)
+                    }
+                    chaptersAdapter.submitList(display)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    binding.swipeRefresh.isRefreshing = false
+                    Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun renderHeader(title: String, projectDto: ProjectResponseDto?) {
+        binding.tvTitle.text = title
+        val total = chapters.size
+        val approved = items.count { it.status?.name == "APPROVED" }
+        binding.tvProgress.text = "$approved / $total"
+        binding.progressIndicator.max = if (total > 0) total else 100
+        binding.progressIndicator.progress = approved
+        binding.tvProjectTitle.text = projectDto?.title ?: "Мой проект"
+        binding.tvProjectStatus.text = if (projectDto?.isApprovedForDefense == true) "Допущен к защите" else "Не допущён"
+    }
+
+    private fun onAttachClicked(chapterIndex: Int) {
+        pendingChapterIndex = chapterIndex
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+        }
+        pickPdf.launch(intent)
+    }
+
+    private fun uploadFileForChapter(uri: Uri, chapterIndex: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val fname = queryFileName(uri) ?: "file.pdf"
+                val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+                if (inputStream == null) {
+                    withContext(Dispatchers.Main) { Toast.makeText(requireContext(), "Невозможно прочитать файл", Toast.LENGTH_SHORT).show() }
+                    return@launch
+                }
+
+                val tmp = File(requireContext().cacheDir, "upload_${System.currentTimeMillis()}_${fname}")
+                inputStream.use { input -> tmp.outputStream().use { out -> input.copyTo(out) } }
+
+                val reqFile = RequestBody.create("application/pdf".toMediaTypeOrNull(), tmp)
+                val part = MultipartBody.Part.createFormData("file", tmp.name, reqFile)
+                val projectId = project?.id ?: run {
+                    withContext(Dispatchers.Main) { Toast.makeText(requireContext(), "Проект не найден", Toast.LENGTH_SHORT).show() }
+                    return@launch
+                }
+
+                val projectIdBody = RequestBody.create("text/plain".toMediaTypeOrNull(), projectId.toString())
+
+                withContext(Dispatchers.Main) { binding.progressBar.visibility = View.VISIBLE }
+
+                val resp = ApiClient.apiService.createExplanatoryNoteItem(projectIdBody, part)
+
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    if (resp.isSuccessful) {
+                        Toast.makeText(requireContext(), "Файл отправлен (черновик)", Toast.LENGTH_SHORT).show()
+                        loadData()
+                    } else {
+                        Toast.makeText(requireContext(), "Ошибка загрузки: ${resp.code()}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun queryFileName(uri: Uri): String? {
+        var name: String? = null
+        val cursor = requireContext().contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val idx = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (idx >= 0) name = it.getString(idx)
+            }
+        }
+        return name
+    }
+
+    private fun openPdfForItem(item: ExplanatoryNoteItemResponseDto?) {
+        if (item == null || item.id == null) {
+            Toast.makeText(requireContext(), "Файл не найден", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val ownerId = project?.owner?.id
+        val projectId = project?.id
+        val itemId = item.id
+        if (ownerId == null || projectId == null) {
+            Toast.makeText(requireContext(), "Не удалось определить владельца проекта", Toast.LENGTH_SHORT).show()
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val resp = ApiClient.apiService.downloadItemFile(ownerId, projectId, itemId)
+                if (!resp.isSuccessful || resp.body() == null) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Ошибка загрузки файла: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+                val inputStream = resp.body()!!.byteStream()
+                val file = File(requireContext().cacheDir, "project_${projectId}_item_${itemId}.pdf")
+                file.outputStream().use { out -> inputStream.copyTo(out) }
+
+                withContext(Dispatchers.Main) {
+                    val intent = android.content.Intent(requireContext(), com.github.stepwise.ui.viewer.PdfViewerActivity::class.java)
+                    intent.putExtra("pdf_path", file.absolutePath)
+                    startActivity(intent)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

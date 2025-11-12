@@ -9,7 +9,21 @@
         android:id="@+id/student_projects_fragment"
         android:name="com.github.stepwise.ui.student.StudentProjectsFragment"
         android:label="Мои проекты"
-        tools:layout="@layout/fragment_student_projects" />
+        tools:layout="@layout/fragment_student_projects" >
+        <action
+            android:id="@+id/action_student_projects_to_detail"
+            app:destination="@id/student_project_detail_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/student_project_detail_fragment"
+        android:name="com.github.stepwise.ui.student.StudentProjectDetailFragment"
+        android:label="Проект"
+        tools:layout="@layout/fragment_student_project_detail">
+        <argument
+            android:name="workId"
+            app:argType="long" />
+    </fragment>
 
     <fragment
         android:id="@+id/profile_fragment"
@@ -19,4 +33,5 @@
             android:name="userId"
             app:argType="long" />
     </fragment>
+
 </navigation>

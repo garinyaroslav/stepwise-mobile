@@ -87,4 +87,14 @@ interface ApiService {
 
     @POST("auth/password/reset")
     suspend fun resetPassword(@Body redDto: ResetPasswordDto): Response<Void>
+
+    @GET("work/student")
+    suspend fun getStudentWorks(): Response<List<WorkResponseDto>>
+
+    @Multipart
+    @POST("explanatory-note-item/draft")
+    suspend fun createExplanatoryNoteItem(
+        @Part("projectId") projectId: RequestBody,
+        @Part file: MultipartBody.Part
+    ): Response<Void>
 }
