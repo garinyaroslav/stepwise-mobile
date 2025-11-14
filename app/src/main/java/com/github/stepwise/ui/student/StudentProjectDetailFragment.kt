@@ -1,16 +1,19 @@
 package com.github.stepwise.ui.student
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +21,7 @@ import com.github.stepwise.databinding.FragmentStudentProjectDetailBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
 import com.github.stepwise.network.models.ProjectResponseDto
+import com.github.stepwise.network.models.UpdateProjectDto
 import com.github.stepwise.network.models.WorkChapterDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +31,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.io.InputStream
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class StudentProjectDetailFragment : Fragment() {
 
@@ -74,6 +80,10 @@ class StudentProjectDetailFragment : Fragment() {
         binding.rvChapters.adapter = chaptersAdapter
 
         binding.swipeRefresh.setOnRefreshListener { loadData() }
+
+        binding.tvProjectTitle.setOnClickListener {
+            showEditProjectDialog()
+        }
 
         loadData()
     }
@@ -245,6 +255,75 @@ class StudentProjectDetailFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showEditProjectDialog() {
+        val proj = project ?: run {
+            Toast.makeText(requireContext(), "Проект не загружен", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val ctx = requireContext()
+        val lp = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(20, 12, 20, 0)
+        }
+        val etTitle = EditText(ctx).apply {
+            hint = "Название проекта"
+            setText(proj.title ?: "")
+        }
+        val etDesc = EditText(ctx).apply {
+            hint = "Описание проекта"
+            setText(proj.description ?: "")
+            minLines = 3
+        }
+        lp.addView(etTitle)
+        lp.addView(etDesc)
+
+        val dlg = AlertDialog.Builder(ctx)
+            .setTitle("Редактировать проект")
+            .setView(lp)
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Сохранить", null)
+            .create()
+
+        dlg.setOnShowListener {
+            val positive = dlg.getButton(AlertDialog.BUTTON_POSITIVE)
+            positive.setOnClickListener {
+                val newTitle = etTitle.text?.toString()?.trim().orEmpty()
+                val newDesc = etDesc.text?.toString()?.trim().orEmpty()
+                if (newTitle.length < 3) {
+                    Toast.makeText(ctx, "Название должно быть не менее 3 символов", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                positive.isEnabled = false
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        val dto = UpdateProjectDto(id = proj.id ?: -1L, title = newTitle, description = newDesc)
+                        val resp = ApiClient.apiService.updateProject(dto)
+                        withContext(Dispatchers.Main) {
+                            positive.isEnabled = true
+                            if (resp.isSuccessful) {
+                                Toast.makeText(ctx, "Проект успешно обновлён", Toast.LENGTH_SHORT).show()
+                                dlg.dismiss()
+                                loadData()
+                            } else {
+                                val msg = try { resp.errorBody()?.string() } catch (t: Throwable) { null }
+                                Toast.makeText(ctx, msg ?: "Ошибка обновления: ${resp.code()}", Toast.LENGTH_LONG).show()
+                            }
+                        }                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        withContext(Dispatchers.Main) {
+                            positive.isEnabled = true
+                            Toast.makeText(ctx, "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+        }
+
+        dlg.show()
     }
 
     override fun onDestroyView() {
