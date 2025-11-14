@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.stepwise.R
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
 import com.github.stepwise.network.models.WorkChapterDto
+import formatIsoToDdMmYyyy
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -49,7 +50,7 @@ class ProjectChaptersAdapter(
         val (chapter, item) = getItem(position)
         holder.tvTitle.text = chapter.title ?: "Пункт ${chapter.index}"
         val deadlineStr = chapter.deadline ?: ""
-        holder.tvDeadline.text = deadlineStr
+        holder.tvDeadline.text = formatIsoToDdMmYyyy(deadlineStr)
 
         var overdue = false
         try {

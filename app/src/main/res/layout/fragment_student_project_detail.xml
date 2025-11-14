@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -10,9 +9,9 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:padding="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -25,13 +24,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+            <TextView
+                android:id="@+id/tvProjectDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:ellipsize="end"
+                android:maxLines="3" />
+
+            <TextView
+                android:id="@+id/tvToggleDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Читать полностью"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvProjectStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -56,19 +75,13 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvChapters"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:nestedScrollingEnabled="true"
                 android:layout_marginTop="12dp" />
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                style="?android:attr/progressBarStyle" />
+            <ProgressBar android:id="@+id/progressBar" android:layout_width="48dp" android:layout_height="48dp" android:visibility="gone"/>
 
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

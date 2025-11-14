@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/student_project_detail_fragment"
         android:name="com.github.stepwise.ui.student.StudentProjectDetailFragment"
-        android:label="Проект"
+        android:label="Подробнее"
         tools:layout="@layout/fragment_student_project_detail">
         <argument
             android:name="workId"

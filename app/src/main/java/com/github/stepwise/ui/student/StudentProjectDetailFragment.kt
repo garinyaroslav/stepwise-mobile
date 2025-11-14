@@ -1,11 +1,11 @@
 package com.github.stepwise.ui.student
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,27 +31,19 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.io.InputStream
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class StudentProjectDetailFragment : Fragment() {
-
     private var _binding: FragmentStudentProjectDetailBinding? = null
     private val binding get() = _binding!!
-
     private var workId: Long = -1L
     private var project: ProjectResponseDto? = null
     private var chapters: List<WorkChapterDto> = emptyList()
     private var items: List<ExplanatoryNoteItemResponseDto> = emptyList()
-
     private lateinit var chaptersAdapter: ProjectChaptersAdapter
-
     private var pendingChapterIndex: Int = -1
 
     private val pickPdf = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode != Activity.RESULT_OK) {
-            return@registerForActivityResult
-        }
+        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         val data: Intent? = result.data
         val uri: Uri? = data?.data
         if (uri != null) {
@@ -119,13 +111,13 @@ class StudentProjectDetailFragment : Fragment() {
                         Toast.makeText(requireContext(), "Работа не найдена", Toast.LENGTH_SHORT).show()
                         return@withContext
                     }
-                    chapters = work.academicWorkChapters ?: emptyList()
+                    chapters = (work.academicWorkChapters ?: emptyList()).sortedBy { it.index }
                     project = projectDto
                     items = projectDto?.items ?: emptyList()
 
                     renderHeader(work.title ?: "", projectDto)
                     val display = chapters.map { ch ->
-                        val item = items.find { it.orderNumber == ch.index }
+                        val item = items.find { it.orderNumber == ch.index } // may be null
                         Pair(ch, item)
                     }
                     chaptersAdapter.submitList(display)
@@ -149,6 +141,44 @@ class StudentProjectDetailFragment : Fragment() {
         binding.progressIndicator.progress = approved
         binding.tvProjectTitle.text = projectDto?.title ?: "Мой проект"
         binding.tvProjectStatus.text = if (projectDto?.isApprovedForDefense == true) "Допущен к защите" else "Не допущён"
+
+        setupDescription(projectDto?.description)
+    }
+
+    private fun setupDescription(description: String?) {
+        val desc = description ?: ""
+        if (desc.isBlank()) {
+            binding.tvProjectDescription.visibility = View.GONE
+            binding.tvToggleDescription.visibility = View.GONE
+            return
+        }
+
+        binding.tvProjectDescription.visibility = View.VISIBLE
+        binding.tvProjectDescription.text = desc
+        binding.tvProjectDescription.maxLines = 3
+        binding.tvProjectDescription.ellipsize = TextUtils.TruncateAt.END
+        binding.tvToggleDescription.visibility = View.GONE
+
+        binding.tvProjectDescription.post {
+            if (binding.tvProjectDescription.lineCount > 3) {
+                binding.tvToggleDescription.visibility = View.VISIBLE
+                binding.tvToggleDescription.text = "Читать полностью"
+                binding.tvToggleDescription.setOnClickListener {
+                    val expanded = binding.tvProjectDescription.maxLines == Int.MAX_VALUE
+                    if (expanded) {
+                        binding.tvProjectDescription.maxLines = 3
+                        binding.tvProjectDescription.ellipsize = TextUtils.TruncateAt.END
+                        binding.tvToggleDescription.text = "Читать полностью"
+                    } else {
+                        binding.tvProjectDescription.maxLines = Int.MAX_VALUE
+                        binding.tvProjectDescription.ellipsize = null
+                        binding.tvToggleDescription.text = "Свернуть"
+                    }
+                }
+            } else {
+                binding.tvToggleDescription.visibility = View.GONE
+            }
+        }
     }
 
     private fun onAttachClicked(chapterIndex: Int) {
@@ -166,7 +196,9 @@ class StudentProjectDetailFragment : Fragment() {
                 val fname = queryFileName(uri) ?: "file.pdf"
                 val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
                 if (inputStream == null) {
-                    withContext(Dispatchers.Main) { Toast.makeText(requireContext(), "Невозможно прочитать файл", Toast.LENGTH_SHORT).show() }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Невозможно прочитать файл", Toast.LENGTH_SHORT).show()
+                    }
                     return@launch
                 }
 
@@ -176,7 +208,9 @@ class StudentProjectDetailFragment : Fragment() {
                 val reqFile = RequestBody.create("application/pdf".toMediaTypeOrNull(), tmp)
                 val part = MultipartBody.Part.createFormData("file", tmp.name, reqFile)
                 val projectId = project?.id ?: run {
-                    withContext(Dispatchers.Main) { Toast.makeText(requireContext(), "Проект не найден", Toast.LENGTH_SHORT).show() }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Проект не найден", Toast.LENGTH_SHORT).show()
+                    }
                     return@launch
                 }
 
@@ -312,7 +346,8 @@ class StudentProjectDetailFragment : Fragment() {
                                 val msg = try { resp.errorBody()?.string() } catch (t: Throwable) { null }
                                 Toast.makeText(ctx, msg ?: "Ошибка обновления: ${resp.code()}", Toast.LENGTH_LONG).show()
                             }
-                        }                    } catch (e: Exception) {
+                        }
+                    } catch (e: Exception) {
                         e.printStackTrace()
                         withContext(Dispatchers.Main) {
                             positive.isEnabled = true
