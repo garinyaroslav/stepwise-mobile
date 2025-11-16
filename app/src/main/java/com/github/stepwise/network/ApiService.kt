@@ -56,6 +56,9 @@ interface ApiService {
     @GET("project/{projectId}")
     suspend fun getProjectById(@Path("projectId") projectId: Long): Response<ProjectResponseDto>
 
+    @GET("project/{projectId}/teacher")
+    suspend fun getProjectByIdForTeacher(@Path("projectId") projectId: Long): Response<ProjectResponseDto>
+
     @PUT("project")
     suspend fun updateProject(@Body project: UpdateProjectDto): Response<UpdateProjectDto>
 

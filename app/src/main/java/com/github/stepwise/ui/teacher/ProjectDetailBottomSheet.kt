@@ -98,7 +98,7 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
         binding.progressLoading.visibility = View.VISIBLE
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val resp = ApiClient.apiService.getProjectById(projectId)
+                val resp = ApiClient.apiService.getProjectByIdForTeacher(projectId)
                 if (!resp.isSuccessful) {
                     withContext(Dispatchers.Main) {
                         binding.progressLoading.visibility = View.GONE
@@ -129,8 +129,8 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                             onViewPdf = { _ ->
                                 Toast.makeText(requireContext(), "Невозможно открыть файл: не найден владелец", Toast.LENGTH_SHORT).show()
                             },
-                            onApprove = { item -> /* same approve logic as above */ },
-                            onReject = { item, comment -> /* same reject logic as above */ }
+                            onApprove = { item ->  },
+                            onReject = { item, comment ->  }
                         )
                     } else {
                         itemsAdapter = ExplanatoryItemsAdapter(

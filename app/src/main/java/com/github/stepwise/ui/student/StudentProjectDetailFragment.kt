@@ -263,6 +263,7 @@ class StudentProjectDetailFragment : Fragment() {
             Toast.makeText(requireContext(), "Не удалось определить владельца проекта", Toast.LENGTH_SHORT).show()
             return
         }
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val resp = ApiClient.apiService.downloadItemFile(ownerId, projectId, itemId)
