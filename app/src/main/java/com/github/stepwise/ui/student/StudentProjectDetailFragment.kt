@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import java.io.File
 import java.io.InputStream
 
@@ -44,11 +43,8 @@ class StudentProjectDetailFragment : Fragment() {
 
     private val pickPdf = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
-        val data: Intent? = result.data
-        val uri: Uri? = data?.data
-        if (uri != null) {
-            uploadFileForChapter(uri, pendingChapterIndex)
-        }
+        val uri: Uri? = result.data?.data
+        if (uri != null) uploadFileForChapter(uri, pendingChapterIndex)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,23 +62,21 @@ class StudentProjectDetailFragment : Fragment() {
 
         chaptersAdapter = ProjectChaptersAdapter(
             onAttach = { chapterIndex -> onAttachClicked(chapterIndex) },
-            onView = { item -> openPdfForItem(item) }
+            onView = { item -> openPdfForItem(item) },
+            onSubmit = { item -> submitExplanatoryItem(item) }
         )
         binding.rvChapters.layoutManager = LinearLayoutManager(requireContext())
         binding.rvChapters.adapter = chaptersAdapter
 
         binding.swipeRefresh.setOnRefreshListener { loadData() }
-
-        binding.tvProjectTitle.setOnClickListener {
-            showEditProjectDialog()
-        }
+        binding.tvProjectTitle.setOnClickListener { showEditProjectDialog() }
 
         loadData()
     }
 
     private fun loadData() {
         binding.swipeRefresh.isRefreshing = true
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val workResp = ApiClient.apiService.getWorkById(workId)
                 if (!workResp.isSuccessful) {
@@ -103,7 +97,7 @@ class StudentProjectDetailFragment : Fragment() {
                     return@launch
                 }
                 val projects = pResp.body() ?: emptyList()
-                val projectDto = if (projects.isNotEmpty()) projects[0] else null
+                val projectDto = projects.firstOrNull()
 
                 withContext(Dispatchers.Main) {
                     binding.swipeRefresh.isRefreshing = false
@@ -117,8 +111,8 @@ class StudentProjectDetailFragment : Fragment() {
 
                     renderHeader(work.title ?: "", projectDto)
                     val display = chapters.map { ch ->
-                        val item = items.find { it.orderNumber == ch.index } // may be null
-                        Pair(ch, item)
+                        val item = items.find { it.orderNumber == ch.index }
+                        ch to item
                     }
                     chaptersAdapter.submitList(display)
                 }
@@ -141,7 +135,6 @@ class StudentProjectDetailFragment : Fragment() {
         binding.progressIndicator.progress = approved
         binding.tvProjectTitle.text = projectDto?.title ?: "Мой проект"
         binding.tvProjectStatus.text = if (projectDto?.isApprovedForDefense == true) "Допущен к защите" else "Не допущён"
-
         setupDescription(projectDto?.description)
     }
 
@@ -152,13 +145,11 @@ class StudentProjectDetailFragment : Fragment() {
             binding.tvToggleDescription.visibility = View.GONE
             return
         }
-
         binding.tvProjectDescription.visibility = View.VISIBLE
         binding.tvProjectDescription.text = desc
         binding.tvProjectDescription.maxLines = 3
         binding.tvProjectDescription.ellipsize = TextUtils.TruncateAt.END
         binding.tvToggleDescription.visibility = View.GONE
-
         binding.tvProjectDescription.post {
             if (binding.tvProjectDescription.lineCount > 3) {
                 binding.tvToggleDescription.visibility = View.VISIBLE
@@ -191,7 +182,7 @@ class StudentProjectDetailFragment : Fragment() {
     }
 
     private fun uploadFileForChapter(uri: Uri, chapterIndex: Int) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val fname = queryFileName(uri) ?: "file.pdf"
                 val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
@@ -205,7 +196,7 @@ class StudentProjectDetailFragment : Fragment() {
                 val tmp = File(requireContext().cacheDir, "upload_${System.currentTimeMillis()}_${fname}")
                 inputStream.use { input -> tmp.outputStream().use { out -> input.copyTo(out) } }
 
-                val reqFile = RequestBody.create("application/pdf".toMediaTypeOrNull(), tmp)
+                val reqFile = okhttp3.RequestBody.create("application/pdf".toMediaTypeOrNull(), tmp)
                 val part = MultipartBody.Part.createFormData("file", tmp.name, reqFile)
                 val projectId = project?.id ?: run {
                     withContext(Dispatchers.Main) {
@@ -214,7 +205,7 @@ class StudentProjectDetailFragment : Fragment() {
                     return@launch
                 }
 
-                val projectIdBody = RequestBody.create("text/plain".toMediaTypeOrNull(), projectId.toString())
+                val projectIdBody = okhttp3.RequestBody.create("text/plain".toMediaTypeOrNull(), projectId.toString())
 
                 withContext(Dispatchers.Main) { binding.progressBar.visibility = View.VISIBLE }
 
@@ -264,7 +255,7 @@ class StudentProjectDetailFragment : Fragment() {
             return
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val resp = ApiClient.apiService.downloadItemFile(ownerId, projectId, itemId)
                 if (!resp.isSuccessful || resp.body() == null) {
@@ -287,6 +278,35 @@ class StudentProjectDetailFragment : Fragment() {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun submitExplanatoryItem(item: ExplanatoryNoteItemResponseDto) {
+        val itemId = item.id ?: run {
+            Toast.makeText(requireContext(), "Неверный id пункта", Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.swipeRefresh.isEnabled = false
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val resp = ApiClient.apiService.submitExplanatoryNoteItem(itemId)
+                withContext(Dispatchers.Main) {
+                    binding.swipeRefresh.isEnabled = true
+                    if (resp.isSuccessful) {
+                        Toast.makeText(requireContext(), "Пункт отправлен на проверку", Toast.LENGTH_SHORT).show()
+                        loadData()
+                    } else {
+                        val msg = try { resp.errorBody()?.string() } catch (_: Throwable) { null }
+                        Toast.makeText(requireContext(), msg ?: "Ошибка отправки: ${resp.code()}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    binding.swipeRefresh.isEnabled = true
+                    Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -333,7 +353,7 @@ class StudentProjectDetailFragment : Fragment() {
                 }
 
                 positive.isEnabled = false
-                lifecycleScope.launch(Dispatchers.IO) {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         val dto = UpdateProjectDto(id = proj.id ?: -1L, title = newTitle, description = newDesc)
                         val resp = ApiClient.apiService.updateProject(dto)
@@ -344,7 +364,7 @@ class StudentProjectDetailFragment : Fragment() {
                                 dlg.dismiss()
                                 loadData()
                             } else {
-                                val msg = try { resp.errorBody()?.string() } catch (t: Throwable) { null }
+                                val msg = try { resp.errorBody()?.string() } catch (_: Throwable) { null }
                                 Toast.makeText(ctx, msg ?: "Ошибка обновления: ${resp.code()}", Toast.LENGTH_LONG).show()
                             }
                         }

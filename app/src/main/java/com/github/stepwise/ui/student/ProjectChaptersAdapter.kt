@@ -19,18 +19,25 @@ import java.time.format.DateTimeFormatter
 
 class ProjectChaptersAdapter(
     private val onAttach: (chapterIndex: Int) -> Unit,
-    private val onView: (item: ExplanatoryNoteItemResponseDto?) -> Unit
+    private val onView: (item: ExplanatoryNoteItemResponseDto?) -> Unit,
+    private val onSubmit: (item: ExplanatoryNoteItemResponseDto) -> Unit
 ) : ListAdapter<Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>, ProjectChaptersAdapter.VH>(DIFF) {
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>>() {
-            override fun areItemsTheSame(oldItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>, newItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>): Boolean =
-                oldItem.first.index == newItem.first.index
+            override fun areItemsTheSame(
+                oldItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>,
+                newItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>
+            ): Boolean = oldItem.first.index == newItem.first.index
 
-            override fun areContentsTheSame(oldItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>, newItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>): Boolean =
-                oldItem == newItem
+            override fun areContentsTheSame(
+                oldItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>,
+                newItem: Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>
+            ): Boolean = oldItem == newItem
         }
     }
+
+    private var firstAttachablePosition: Int? = null
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         val card: CardView = view.findViewById(R.id.cardChapter)
@@ -39,6 +46,17 @@ class ProjectChaptersAdapter(
         val tvStatus: TextView = view.findViewById(R.id.tvChapterStatus)
         val btnAttach: Button = view.findViewById(R.id.btnAttach)
         val btnView: Button = view.findViewById(R.id.btnView)
+        val btnSubmit: Button = view.findViewById(R.id.btnSubmit)
+    }
+
+    override fun submitList(list: List<Pair<WorkChapterDto, ExplanatoryNoteItemResponseDto?>>?) {
+        firstAttachablePosition = list
+            ?.withIndex()
+            ?.firstOrNull { (_, pair) ->
+                val item = pair.second
+                item == null || item.status?.name == "DRAFT" || item.status?.name == "REJECTED"
+            }?.index
+        super.submitList(list)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -54,32 +72,68 @@ class ProjectChaptersAdapter(
 
         var overdue = false
         try {
-            if (!deadlineStr.isNullOrBlank()) {
+            if (deadlineStr.isNotBlank()) {
                 val dt = LocalDateTime.parse(deadlineStr, DateTimeFormatter.ISO_DATE_TIME)
                 if (dt.isBefore(LocalDateTime.now())) overdue = true
             }
-        } catch (_: Exception) {  }
+        } catch (_: Exception) { }
 
-        val approved = item?.status?.name == "APPROVED"
-        if (overdue && !approved) {
-            holder.tvDeadline.setTextColor(Color.RED)
-        } else {
-            holder.tvDeadline.setTextColor(Color.DKGRAY)
+        val status = item?.status?.name
+        val approved = status == "APPROVED"
+        holder.tvDeadline.setTextColor(if (overdue && !approved) Color.RED else Color.DKGRAY)
+        holder.tvStatus.text = status ?: "Не прикреплён"
+
+        holder.btnAttach.visibility = View.GONE
+        holder.btnView.visibility = View.GONE
+        holder.btnSubmit.visibility = View.GONE
+        holder.btnAttach.isEnabled = true
+        holder.btnSubmit.isEnabled = true
+
+        val isFirstAttachable = firstAttachablePosition == position
+        val isLastChapterOverall = position == itemCount - 1
+        val hasFile = item?.fileName?.isNotBlank() == true
+
+        when {
+            item == null -> {
+                if (isFirstAttachable) {
+                    holder.btnAttach.visibility = View.VISIBLE
+                    holder.btnAttach.text = "Прикрепить"
+                }
+            }
+
+            status == "DRAFT" -> {
+                if (isFirstAttachable) {
+                    holder.btnAttach.visibility = View.VISIBLE
+                    holder.btnAttach.text = if (hasFile) "Заменить" else "Загрузить"
+                }
+                if (hasFile) holder.btnView.visibility = View.VISIBLE
+                if (isFirstAttachable && isLastChapterOverall && hasFile) {
+                    holder.btnSubmit.visibility = View.VISIBLE
+                }
+            }
+
+            status == "SUBMITTED" -> {
+                if (hasFile) holder.btnView.visibility = View.VISIBLE
+            }
+
+            status == "APPROVED" -> {
+                if (hasFile) holder.btnView.visibility = View.VISIBLE
+            }
+
+            status == "REJECTED" -> {
+                if (isFirstAttachable) {
+                    holder.btnAttach.visibility = View.VISIBLE
+                    holder.btnAttach.text = "Заменить"
+                }
+                if (hasFile) holder.btnView.visibility = View.VISIBLE
+            }
         }
 
-        holder.tvStatus.text = item?.status?.name ?: "Не прикреплён"
-
-        holder.btnView.visibility = if (item?.fileName != null) View.VISIBLE else View.GONE
-
-        val canAttach = item == null || item.status?.name == "DRAFT" || item.status?.name == "REJECTED"
-        holder.btnAttach.isEnabled = canAttach
-        holder.btnAttach.text = if (item == null) "Прикрепить" else if (item.status?.name == "REJECTED") "Заменить" else "Загрузить"
-
-        holder.btnAttach.setOnClickListener {
-            onAttach(chapter.index)
-        }
-        holder.btnView.setOnClickListener {
-            onView(item)
+        holder.btnAttach.setOnClickListener { onAttach(chapter.index) }
+        holder.btnView.setOnClickListener { onView(item) }
+        holder.btnSubmit.setOnClickListener {
+            holder.btnSubmit.isEnabled = false
+            item?.let { onSubmit(it) }
         }
     }
 }

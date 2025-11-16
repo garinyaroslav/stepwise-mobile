@@ -75,13 +75,6 @@ interface ApiService {
         @Query("itemId") itemId: Long
     ): Response<ResponseBody>
 
-    @Multipart
-    @POST("explanatory-note-item/draft")
-    suspend fun createDraftExplanatoryNoteItem(
-        @Part("projectId") projectId: RequestBody,
-        @Part file: MultipartBody.Part
-    ): Response<Void>
-
     @POST("explanatory-note-item/submit/{id}")
     suspend fun submitExplanatoryNoteItem(@Path("id") id: Long): Response<Void>
 
