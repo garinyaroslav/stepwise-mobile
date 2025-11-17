@@ -90,7 +90,6 @@ class ProjectChaptersAdapter(
         holder.btnSubmit.isEnabled = true
 
         val isFirstAttachable = firstAttachablePosition == position
-        val isLastChapterOverall = position == itemCount - 1
         val hasFile = item?.fileName?.isNotBlank() == true
 
         when {
@@ -107,7 +106,7 @@ class ProjectChaptersAdapter(
                     holder.btnAttach.text = if (hasFile) "Заменить" else "Загрузить"
                 }
                 if (hasFile) holder.btnView.visibility = View.VISIBLE
-                if (isFirstAttachable && isLastChapterOverall && hasFile) {
+                if (isFirstAttachable && hasFile) {
                     holder.btnSubmit.visibility = View.VISIBLE
                 }
             }
