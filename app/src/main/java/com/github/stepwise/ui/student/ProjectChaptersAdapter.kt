@@ -44,6 +44,7 @@ class ProjectChaptersAdapter(
         val tvTitle: TextView = view.findViewById(R.id.tvChapterTitle)
         val tvDeadline: TextView = view.findViewById(R.id.tvChapterDeadline)
         val tvStatus: TextView = view.findViewById(R.id.tvChapterStatus)
+        val tvTeacherComment: TextView = view.findViewById(R.id.tvTeacherComment)
         val btnAttach: Button = view.findViewById(R.id.btnAttach)
         val btnView: Button = view.findViewById(R.id.btnView)
         val btnSubmit: Button = view.findViewById(R.id.btnSubmit)
@@ -86,6 +87,7 @@ class ProjectChaptersAdapter(
         holder.btnAttach.visibility = View.GONE
         holder.btnView.visibility = View.GONE
         holder.btnSubmit.visibility = View.GONE
+        holder.tvTeacherComment.visibility = View.GONE
         holder.btnAttach.isEnabled = true
         holder.btnSubmit.isEnabled = true
 
@@ -104,10 +106,12 @@ class ProjectChaptersAdapter(
                 if (isFirstAttachable) {
                     holder.btnAttach.visibility = View.VISIBLE
                     holder.btnAttach.text = if (hasFile) "Заменить" else "Загрузить"
-                }
-                if (hasFile) holder.btnView.visibility = View.VISIBLE
-                if (isFirstAttachable && hasFile) {
+                    if (hasFile) holder.btnView.visibility = View.VISIBLE
+
                     holder.btnSubmit.visibility = View.VISIBLE
+                    holder.btnSubmit.isEnabled = hasFile
+                } else {
+                    if (hasFile) holder.btnView.visibility = View.VISIBLE
                 }
             }
 
@@ -123,8 +127,15 @@ class ProjectChaptersAdapter(
                 if (isFirstAttachable) {
                     holder.btnAttach.visibility = View.VISIBLE
                     holder.btnAttach.text = "Заменить"
+                    if (hasFile) holder.btnView.visibility = View.VISIBLE
+                    val comment = item.teacherComment?.trim()
+                    if (!comment.isNullOrEmpty()) {
+                        holder.tvTeacherComment.visibility = View.VISIBLE
+                        holder.tvTeacherComment.text = "Комментарий преподавателя:\n$comment"
+                    }
+                } else {
+                    if (hasFile) holder.btnView.visibility = View.VISIBLE
                 }
-                if (hasFile) holder.btnView.visibility = View.VISIBLE
             }
         }
 
