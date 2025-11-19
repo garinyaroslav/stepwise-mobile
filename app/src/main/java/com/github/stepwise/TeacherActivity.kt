@@ -1,46 +1,29 @@
 package com.github.stepwise
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.github.stepwise.databinding.ActivityTeacherBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import com.github.stepwise.ui.compose.navigation.TeacherApp
+import com.github.stepwise.ui.theme.StepwiseTheme
 
-class TeacherActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityTeacherBinding
-    private lateinit var appBarConfiguration: AppBarConfiguration
+class TeacherActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityTeacherBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setSupportActionBar(binding.toolbarTeacher)
-
-        val navView: BottomNavigationView = binding.navViewTeacher
-
-        val navController = findNavController(R.id.nav_host_fragment_teacher)
-
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.teacher_creation_fragment,
-                R.id.teacher_projects_fragment,
-                R.id.profile_fragment
-            )
-        )
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_teacher)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        setContent {
+            StepwiseTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    TeacherApp()
+                }
+            }
+        }
     }
 }
