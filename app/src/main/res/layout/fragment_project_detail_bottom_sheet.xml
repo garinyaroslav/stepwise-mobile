@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="12dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,21 +18,48 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Проект студента"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApproveProject"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minHeight="40dp"
+            android:text="Допустить"
+            android:visibility="gone"
+            app:icon="@drawable/verified"
+            app:iconGravity="textStart"
+            app:iconPadding="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
 
         <ImageButton
             android:id="@+id/btnClose"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Закрыть"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
     </LinearLayout>
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipDefenseStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"
+        app:chipIcon="@drawable/verified"
+        app:chipIconVisible="true"
+        android:text="Допущен к защите" />
+
     <TextView
+        android:id="@+id/tvItemsHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Пункты пояснительной записки"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:textAppearance="?attr/textAppearanceCaption" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -48,14 +76,14 @@
         android:text="Нет пунктов"
         android:gravity="center"
         android:visibility="gone"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="16dp" />
 
     <ProgressBar
         android:id="@+id/progressLoading"
         android:layout_gravity="center"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:visibility="gone"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

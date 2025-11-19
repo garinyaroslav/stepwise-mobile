@@ -93,4 +93,7 @@ interface ApiService {
         @Part("projectId") projectId: RequestBody,
         @Part file: MultipartBody.Part
     ): Response<Void>
+
+    @POST("project/{projectId}/approve")
+    suspend fun approveProject(@Path("projectId") projectId: Long): Response<ProjectResponseDto>
 }

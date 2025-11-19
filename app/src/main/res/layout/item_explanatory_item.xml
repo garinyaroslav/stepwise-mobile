@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="Посмотреть"
-                android:src="@android:drawable/ic_menu_view" />
+                android:src="@drawable/eye" />
 
             <ImageButton
                 android:id="@+id/btnApprove"
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="Подтвердить"
-                android:src="@android:drawable/ic_input_add" />
+                android:src="@drawable/check" />
 
             <ImageButton
                 android:id="@+id/btnReject"
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="Отклонить"
-                android:src="@android:drawable/ic_delete" />
+                android:src="@drawable/cross" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
