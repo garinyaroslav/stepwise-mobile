@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="2dp">
+    android:layout_marginBottom="10dp">
 
     <LinearLayout
         android:padding="12dp"
@@ -14,35 +11,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvItemOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvItemOrder"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Пункт 1"
-                android:textAppearance="?attr/textAppearanceSubtitle2" />
+        <TextView
+            android:id="@+id/tvItemTitle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tvItemStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SUBMITTED"
-                android:textAppearance="?attr/textAppearanceCaption" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvItemStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textAppearance="?attr/textAppearanceBody2" />
 
         <TextView
             android:id="@+id/tvItemComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Комментарий преподавателя..."
-            android:layout_marginTop="6dp"
-            android:textAppearance="?attr/textAppearanceBody2" />
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceCaption" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,25 +47,26 @@
 
             <ImageButton
                 android:id="@+id/btnViewPdf"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Посмотреть"
                 android:src="@android:drawable/ic_menu_view" />
 
             <ImageButton
                 android:id="@+id/btnApprove"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Подтвердить"
                 android:src="@android:drawable/ic_input_add" />
 
             <ImageButton
                 android:id="@+id/btnReject"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Отклонить"
                 android:src="@android:drawable/ic_delete" />
         </LinearLayout>
     </LinearLayout>

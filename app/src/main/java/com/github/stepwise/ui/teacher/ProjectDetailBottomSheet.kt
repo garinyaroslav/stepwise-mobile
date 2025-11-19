@@ -7,12 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.stepwise.databinding.FragmentProjectDetailBottomSheetBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.RejectItemDto
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
+import com.github.stepwise.network.models.WorkResponseDto
+import com.github.stepwise.network.models.WorkChapterDto
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -24,11 +28,16 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private var projectId: Long = -1L
+    private var workId: Long = -1L
+
     private lateinit var itemsAdapter: ExplanatoryItemsAdapter
+
+    private var chapterTitles: Map<Int, String> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         projectId = arguments?.getLong("projectId", -1L) ?: -1L
+        workId = arguments?.getLong("workId", -1L) ?: -1L
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -40,6 +49,7 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         itemsAdapter = ExplanatoryItemsAdapter(
+            chapterTitles = chapterTitles,
             onViewPdf = { _ ->
                 Toast.makeText(requireContext(), "Loading...", Toast.LENGTH_SHORT).show()
             },
@@ -86,7 +96,7 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
             }
         )
 
-        binding.rvItems.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        binding.rvItems.layoutManager = LinearLayoutManager(requireContext())
         binding.rvItems.adapter = itemsAdapter
 
         binding.btnClose.setOnClickListener { dismiss() }
@@ -94,11 +104,36 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
         loadProjectItems()
     }
 
+    private suspend fun loadChapterTitlesIfNeeded() {
+        if (workId <= 0L) {
+            chapterTitles = emptyMap()
+            return
+        }
+        try {
+            val resp = ApiClient.apiService.getWorkById(workId)
+            if (resp.isSuccessful) {
+                val work: WorkResponseDto? = resp.body()
+                val chapters: List<WorkChapterDto> = work?.academicWorkChapters ?: emptyList()
+                chapterTitles = chapters.associate { (it.index ?: 0) to (it.title ?: "") }
+            } else {
+                chapterTitles = emptyMap()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            chapterTitles = emptyMap()
+        }
+    }
+
     private fun loadProjectItems() {
         binding.progressLoading.visibility = View.VISIBLE
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val resp = ApiClient.apiService.getProjectByIdForTeacher(projectId)
+                val chaptersDeferred = async { loadChapterTitlesIfNeeded() }
+                val projectRespDeferred = async { ApiClient.apiService.getProjectByIdForTeacher(projectId) }
+
+                chaptersDeferred.await()
+                val resp = projectRespDeferred.await()
+
                 if (!resp.isSuccessful) {
                     withContext(Dispatchers.Main) {
                         binding.progressLoading.visibility = View.GONE
@@ -116,24 +151,22 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                     return@launch
                 }
 
-                val items: List<ExplanatoryNoteItemResponseDto> = project.items ?: emptyList()
+                val items: List<ExplanatoryNoteItemResponseDto> =
+                    (project.items ?: emptyList())
+                        .sortedBy { it.orderNumber ?: Int.MAX_VALUE }
 
                 val ownerId = project.owner?.id
                 withContext(Dispatchers.Main) {
                     binding.progressLoading.visibility = View.GONE
 
+                    itemsAdapter.updateChapterTitles(chapterTitles)
+
                     if (ownerId == null) {
                         Toast.makeText(requireContext(), "Владелец проекта не определён — нельзя открыть файлы", Toast.LENGTH_LONG).show()
-
-                        itemsAdapter = ExplanatoryItemsAdapter(
-                            onViewPdf = { _ ->
-                                Toast.makeText(requireContext(), "Невозможно открыть файл: не найден владелец", Toast.LENGTH_SHORT).show()
-                            },
-                            onApprove = { item ->  },
-                            onReject = { item, comment ->  }
-                        )
+                        itemsAdapter.setActionsEnabled(false)
                     } else {
-                        itemsAdapter = ExplanatoryItemsAdapter(
+                        itemsAdapter.setActionsEnabled(true)
+                        itemsAdapter.setHandlers(
                             onViewPdf = { item ->
                                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                                     try {
@@ -238,10 +271,11 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(projectId: Long): ProjectDetailBottomSheet {
+        fun newInstance(projectId: Long, workId: Long): ProjectDetailBottomSheet {
             val b = ProjectDetailBottomSheet()
             val args = Bundle()
             args.putLong("projectId", projectId)
+            args.putLong("workId", workId)
             b.arguments = args
             return b
         }

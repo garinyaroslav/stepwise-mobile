@@ -14,23 +14,30 @@ import com.github.stepwise.network.models.ItemStatus
 import com.google.android.material.card.MaterialCardView
 
 class ExplanatoryItemsAdapter(
-    private val onViewPdf: (ExplanatoryNoteItemResponseDto) -> Unit,
-    private val onApprove: (ExplanatoryNoteItemResponseDto) -> Unit,
-    private val onReject: (ExplanatoryNoteItemResponseDto, String) -> Unit
+    private var chapterTitles: Map<Int, String> = emptyMap(),
+    private var onViewPdf: (ExplanatoryNoteItemResponseDto) -> Unit,
+    private var onApprove: (ExplanatoryNoteItemResponseDto) -> Unit,
+    private var onReject: (ExplanatoryNoteItemResponseDto, String) -> Unit
 ) : ListAdapter<ExplanatoryNoteItemResponseDto, ExplanatoryItemsAdapter.VH>(DIFF) {
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<ExplanatoryNoteItemResponseDto>() {
-            override fun areItemsTheSame(oldItem: ExplanatoryNoteItemResponseDto, newItem: ExplanatoryNoteItemResponseDto): Boolean =
-                oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: ExplanatoryNoteItemResponseDto, newItem: ExplanatoryNoteItemResponseDto): Boolean =
-                oldItem == newItem
+            override fun areItemsTheSame(
+                oldItem: ExplanatoryNoteItemResponseDto,
+                newItem: ExplanatoryNoteItemResponseDto
+            ): Boolean = oldItem.id == newItem.id
+
+            override fun areContentsTheSame(
+                oldItem: ExplanatoryNoteItemResponseDto,
+                newItem: ExplanatoryNoteItemResponseDto
+            ): Boolean = oldItem == newItem
         }
     }
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         val card: MaterialCardView = view.findViewById(R.id.cardItem)
         val tvOrder: TextView = view.findViewById(R.id.tvItemOrder)
+        val tvTitle: TextView = view.findViewById(R.id.tvItemTitle)
         val tvStatus: TextView = view.findViewById(R.id.tvItemStatus)
         val tvComment: TextView = view.findViewById(R.id.tvItemComment)
         val btnView: ImageButton = view.findViewById(R.id.btnViewPdf)
@@ -39,13 +46,18 @@ class ExplanatoryItemsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_explanatory_item, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_explanatory_item, parent, false)
         return VH(v)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = getItem(position)
-        holder.tvOrder.text = "Пункт ${item.orderNumber ?: position + 1}"
+        val order = (item.orderNumber ?: (position)) + 1
+        val rawTitle = chapterTitles[order].orEmpty().ifBlank { "Без названия" }
+        holder.tvOrder.text = "$order. $rawTitle"
+        holder.tvTitle.visibility = View.GONE
+
         holder.tvStatus.text = item.status?.name ?: "—"
         holder.tvComment.text = item.teacherComment ?: ""
 
@@ -67,7 +79,11 @@ class ExplanatoryItemsAdapter(
                 .setPositiveButton("Отклонить") { _, _ ->
                     val comment = input.text?.toString()?.trim().orEmpty()
                     if (comment.isBlank()) {
-                        android.widget.Toast.makeText(ctx, "Комментарий обязателен", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(
+                            ctx,
+                            "Комментарий обязателен",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         onReject(item, comment)
                     }
@@ -75,5 +91,24 @@ class ExplanatoryItemsAdapter(
                 .setNegativeButton("Отмена", null)
                 .show()
         }
+    }
+
+    fun updateChapterTitles(map: Map<Int, String>) {
+        chapterTitles = map
+        notifyDataSetChanged()
+    }
+
+    fun setActionsEnabled(enabled: Boolean) {
+        notifyDataSetChanged()
+    }
+
+    fun setHandlers(
+        onViewPdf: (ExplanatoryNoteItemResponseDto) -> Unit,
+        onApprove: (ExplanatoryNoteItemResponseDto) -> Unit,
+        onReject: (ExplanatoryNoteItemResponseDto, String) -> Unit
+    ) {
+        this.onViewPdf = onViewPdf
+        this.onApprove = onApprove
+        this.onReject = onReject
     }
 }

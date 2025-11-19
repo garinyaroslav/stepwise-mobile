@@ -27,6 +27,13 @@ class WorkDetailFragment : Fragment() {
     private lateinit var chaptersAdapter: ChaptersAdapter
     private var currentWork: WorkResponseDto? = null
 
+    private var workId: Long = -1L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        workId = arguments?.getLong("workId", -1L) ?: -1L
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentWorkDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -36,7 +43,12 @@ class WorkDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         projectsAdapter = StudentsProjectsAdapter { project ->
-            val bs = ProjectDetailBottomSheet.newInstance(project.id ?: -1L)
+            val projectId = project.id ?: -1L
+            if (projectId <= 0L) {
+                Toast.makeText(requireContext(), "Некорректный id проекта", Toast.LENGTH_SHORT).show()
+                return@StudentsProjectsAdapter
+            }
+            val bs = ProjectDetailBottomSheet.newInstance(projectId, workId)
             bs.show(parentFragmentManager, "project_detail")
         }
         binding.rvProjects.layoutManager = LinearLayoutManager(requireContext())
@@ -47,11 +59,8 @@ class WorkDetailFragment : Fragment() {
         binding.rvChapters.adapter = chaptersAdapter
         binding.rvChapters.isNestedScrollingEnabled = false
 
-        binding.fabRefresh.setOnClickListener {
-            loadWork()
-        }
+        binding.fabRefresh.setOnClickListener { loadWork() }
 
-        val workId = arguments?.getLong("workId", -1L) ?: -1L
         if (workId <= 0) {
             Toast.makeText(requireContext(), "Неверный id работы", Toast.LENGTH_SHORT).show()
             return
@@ -67,7 +76,6 @@ class WorkDetailFragment : Fragment() {
     }
 
     private fun loadWork() {
-        val workId = arguments?.getLong("workId", -1L) ?: -1L
         if (workId <= 0) return
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -83,7 +91,8 @@ class WorkDetailFragment : Fragment() {
                 val work = wResp.body()
 
                 val pResp = ApiClient.apiService.getProjectsByWorkForTeacher(workId)
-                val projects: List<ProjectResponseDto> = if (pResp.isSuccessful) pResp.body() ?: emptyList() else emptyList()
+                val projects: List<ProjectResponseDto> =
+                    if (pResp.isSuccessful) pResp.body() ?: emptyList() else emptyList()
 
                 withContext(Dispatchers.Main) {
                     showLoading(false)
@@ -108,7 +117,7 @@ class WorkDetailFragment : Fragment() {
         binding.tvDescription.text = work.description ?: ""
 
         val typeOfWork = if (work.type == ProjectType.COURSEWORK) "Курсовая работа" else "Дипломная работа"
-        binding.tvMeta.text = "${typeOfWork} у группы ${work.groupName}. Пунктов: ${work.countOfChapters ?: 0}"
+        binding.tvMeta.text = "$typeOfWork у группы ${work.groupName}. Пунктов: ${work.countOfChapters ?: 0}"
 
         val chapters: List<WorkChapterDto> = work.academicWorkChapters ?: emptyList()
         if (chapters.isEmpty()) {
