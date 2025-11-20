@@ -2,51 +2,51 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardChapter"
+    style="@style/Widget.Stepwise.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:cardUseCompatPadding="true"
+    android:layout_marginTop="@dimen/spacing_md"
+    android:layout_marginBottom="@dimen/spacing_md"
     app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="@dimen/spacing_base">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/textChapterIndex"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
                     android:text="1."
-                    android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceBody1" />
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:textColor="?attr/colorPrimary" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilChapterTitle"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_sm"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:hint="Название главы">
+                    android:hint="Название главы"
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etChapterTitle"
                         android:layout_width="match_parent"
@@ -55,21 +55,24 @@
 
                 <ImageButton
                     android:id="@+id/buttonRemoveChapter"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_width="@dimen/button_height"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginStart="@dimen/spacing_sm"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Удалить"
-                    android:src="@drawable/trash" />
+                    android:src="@drawable/trash"
+                    app:tint="?attr/colorError" />
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilChapterDescription"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.Stepwise.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:hint="Описание"
-                android:layout_marginTop="8dp">
+                app:boxBackgroundMode="outline">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etChapterDescription"
                     android:layout_width="match_parent"
@@ -80,31 +83,37 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:gravity="center_vertical"
-                android:layout_marginTop="8dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/textDeadlineLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/spacing_sm"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Дедлайн:"
-                    android:layout_marginEnd="8dp" />
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?attr/colorOnSurface" />
 
                 <TextView
                     android:id="@+id/textDeadline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Не задан"
-                    android:layout_weight="1" />
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
 
                 <ImageButton
                     android:id="@+id/buttonPickDate"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="@dimen/button_height"
+                    android:layout_height="@dimen/button_height"
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Выбрать дату"
                     android:src="@drawable/calendar"
-                    android:contentDescription="Выбрать дату" />
+                    app:tint="?attr/colorPrimary" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

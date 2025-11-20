@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="12dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_xl">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_base"
+        android:background="?attr/colorOutline" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/tvProjectHeader"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
             android:text="Проект студента"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorOnSurface" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnApproveProject"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.Stepwise.Button.Outlined"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:minHeight="40dp"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
             android:text="Допустить"
             android:visibility="gone"
             app:icon="@drawable/verified"
             app:iconGravity="textStart"
-            app:iconPadding="6dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            app:iconPadding="@dimen/spacing_sm" />
 
         <ImageButton
             android:id="@+id/btnClose"
@@ -41,49 +49,57 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Закрыть"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="?attr/colorOnSurface" />
     </LinearLayout>
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chipDefenseStatus"
+        style="@style/Widget.Stepwise.Chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:text="Допущен к защите"
         android:visibility="gone"
         app:chipIcon="@drawable/verified"
-        app:chipIconVisible="true"
-        android:text="Допущен к защите" />
+        app:chipIconVisible="true" />
 
     <TextView
         android:id="@+id/tvItemsHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:fontFamily="sans-serif-medium"
         android:text="Пункты пояснительной записки"
-        android:layout_marginTop="12dp"
-        android:textAppearance="?attr/textAppearanceCaption" />
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/colorOnSurfaceVariant" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:nestedScrollingEnabled="false" />
 
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Нет пунктов"
+        android:layout_marginTop="@dimen/spacing_xl"
         android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginTop="16dp" />
+        android:text="Нет пунктов"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressLoading"
+        style="@style/Widget.Stepwise.CircularProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:visibility="gone"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
 </LinearLayout>
