@@ -2,30 +2,28 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardWork"
+    style="@style/Widget.Stepwise.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
+    android:layout_marginVertical="@dimen/spacing_sm"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_base">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
@@ -33,6 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
                     android:maxLines="2"
                     android:text="Название работы"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
@@ -43,28 +42,28 @@
                     android:id="@+id/tvWorkMeta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="Группа · Преподаватель · 3 главы"
                     android:textAppearance="?attr/textAppearanceCaption"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/ivExpand"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/expand"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:contentDescription="expand"
-                app:tint="@color/colorOnSurface" />
+                android:src="@drawable/expand"
+                app:tint="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/expandedArea"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="8dp">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tvWorkDescription"

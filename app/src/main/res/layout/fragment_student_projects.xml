@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBackground">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -12,7 +14,8 @@
             android:id="@+id/rvWorks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp" />
+            android:clipToPadding="false"
+            android:padding="@dimen/spacing_base" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -20,9 +23,12 @@
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="У вас пока нет работ"
+        android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:visibility="gone"
-        android:textAppearance="?attr/textAppearanceBody2" />
+        android:padding="@dimen/spacing_2xl"
+        android:text="У вас пока нет работ"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

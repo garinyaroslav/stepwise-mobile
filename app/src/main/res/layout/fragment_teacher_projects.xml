@@ -4,85 +4,91 @@
     android:id="@+id/teacherProjectsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorBackground">
 
     <LinearLayout
         android:id="@+id/topContainer"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:background="?attr/colorSurface"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_base">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilGroupFilter"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Stepwise.TextInputLayout"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="Группа">
+            android:layout_weight="1"
+            android:hint="Группа"
+            app:boxBackgroundMode="outline"
+            app:endIconMode="dropdown_menu">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etGroupFilter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="false"
                 android:clickable="true"
+                android:focusable="false"
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <ImageButton
             android:id="@+id/btnClearGroup"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="@dimen/button_height"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginStart="@dimen/spacing_sm"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Очистить фильтр"
             android:src="@drawable/backspace"
-            app:tint="@color/colorOnSurface" />
+            app:tint="?attr/colorOnSurface" />
 
         <ImageButton
             android:id="@+id/btnRefresh"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="@dimen/button_height"
+            android:layout_height="@dimen:button_height"
+            android:layout_marginStart="@dimen/spacing_sm"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Обновить"
             android:src="@drawable/refresh"
-            app:tint="@color/colorOnSurface" />
+            app:tint="?attr/colorOnSurface" />
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/contentFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="72dp">
+        android:layout_marginTop="80dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvWorks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_base"
             android:scrollbars="vertical" />
 
         <TextView
             android:id="@+id/tvEmpty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="У вас пока нет работ"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:visibility="gone"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="?attr/colorOnSurface"
-            android:padding="16dp" />
+            android:padding="@dimen/spacing_2xl"
+            android:text="У вас пока нет работ"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone" />
 
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progressLoading"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            style="@style/Widget.Stepwise.CircularProgressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:indeterminate="true"
             android:visibility="gone" />
     </FrameLayout>
 

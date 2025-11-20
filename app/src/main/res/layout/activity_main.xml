@@ -7,19 +7,18 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_main"
+        style="@style/Widget.Stepwise.MaterialToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_scrollFlags="scroll|enterAlways"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="?attr/colorOnPrimary" />
+        app:layout_scrollFlags="scroll|enterAlways" />
 
     <fragment
         android:id="@+id/nav_host_fragment_activity_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:defaultNavHost="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:navGraph="@navigation/mobile_navigation"
-        app:defaultNavHost="true" />
+        app:navGraph="@navigation/mobile_navigation" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
