@@ -14,7 +14,7 @@
         android:layout_marginStart="@dimen/spacing_xl"
         android:layout_marginEnd="@dimen/spacing_xl"
         app:cardCornerRadius="@dimen/card_corner_radius"
-        app:cardElevation="@dimen/card_elevation_raised"
+        app:cardElevation="0dp"
         app:contentPadding="@dimen/spacing_xl"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,7 @@
                 android:hint="@string/hint_username"
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="?attr/colorPrimary"
-                app:startIconDrawable="@android:drawable/ic_menu_edit"
+                app:startIconDrawable="@drawable/person"
                 app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -91,7 +91,7 @@
                 app:boxStrokeColor="?attr/colorPrimary"
                 app:endIconMode="password_toggle"
                 app:endIconTint="?attr/colorOnSurfaceVariant"
-                app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+                app:startIconDrawable="@drawable/lock"
                 app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
