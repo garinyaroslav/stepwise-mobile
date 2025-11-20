@@ -1,6 +1,5 @@
 package com.github.stepwise.ui.teacher
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
-import java.io.File
 
 class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
 
@@ -32,7 +29,6 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var itemsAdapter: ExplanatoryItemsAdapter
     private var chapterTitles: Map<Int, String> = emptyMap()
-
     private var isApprovedForDefense: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,11 +47,10 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
 
         itemsAdapter = ExplanatoryItemsAdapter(
             chapterTitles = chapterTitles,
-            onViewPdf = { _ -> Toast.makeText(requireContext(), "Загружаю...", Toast.LENGTH_SHORT).show() },
+            scope = viewLifecycleOwner.lifecycleScope,
             onApprove = { item -> approveItem(item) },
             onReject = { item, comment -> rejectItem(item, comment) }
         )
-
         binding.rvItems.layoutManager = LinearLayoutManager(requireContext())
         binding.rvItems.adapter = itemsAdapter
 
@@ -148,6 +143,10 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun loadProjectItems() {
+        if (projectId <= 0L) {
+            Toast.makeText(requireContext(), "Некорректный id проекта", Toast.LENGTH_SHORT).show()
+            return
+        }
         binding.progressLoading.visibility = View.VISIBLE
         binding.btnApproveProject.visibility = View.GONE
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -176,18 +175,21 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                 }
 
                 isApprovedForDefense = project.isApprovedForDefense
+                val ownerId = project.owner?.id
 
                 val items: List<ExplanatoryNoteItemResponseDto> =
                     (project.items ?: emptyList()).sortedBy { it.orderNumber ?: Int.MAX_VALUE }
 
                 val allApproved = items.isNotEmpty() && items.all { it.status?.name == "APPROVED" }
-                val canShowApproveProject =
-                    !isApprovedForDefense && allApproved
+                val canShowApproveProject = !isApprovedForDefense && allApproved
 
                 withContext(Dispatchers.Main) {
                     binding.progressLoading.visibility = View.GONE
+
                     itemsAdapter.updateChapterTitles(chapterTitles)
+                    itemsAdapter.updateContext(ownerId, projectId)
                     itemsAdapter.submitList(items)
+
                     binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
 
                     if (canShowApproveProject) {

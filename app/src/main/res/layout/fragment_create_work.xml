@@ -4,44 +4,44 @@
     android:id="@+id/scrollCreateWork"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
-    android:background="?attr/colorSurface">
+    android:background="@color/colorBackground"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        >
+        android:padding="@dimen/spacing_base">
 
         <TextView
             android:id="@+id/subtitleCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:layout_marginBottom="@dimen/spacing_md"
             android:text="Опишите задание, добавьте части (название, описание, дедлайн)"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginTop="6dp"/>
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Stepwise.CardView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="0dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="0dp">
+                android:padding="@dimen/spacing_base">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilWorkTitle"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Название работы">
+                    android:hint="Название работы"
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etWorkTitle"
                         android:layout_width="match_parent"
@@ -50,26 +50,30 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilWorkDescription"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_base"
                     android:hint="Описание (необязательно)"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etWorkDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minLines="3"
-                        android:inputType="textMultiLine" />
+                        android:inputType="textMultiLine"
+                        android:minLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilGroupId"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Группа">
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:hint="Группа"
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etGroupId"
                         android:layout_width="match_parent"
@@ -81,59 +85,65 @@
                     android:id="@+id/labelType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Тип работы"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="12dp" />
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:textColor="?attr/colorOnSurface" />
 
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/spinnerType"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="6dp"
-                    android:spinnerMode="dropdown"
-                    android:popupBackground="@android:color/white" />
+                    android:layout_height="@dimen/input_min_height"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:background="@android:drawable/spinner_background"
+                    android:popupBackground="?attr/colorSurface"
+                    android:spinnerMode="dropdown" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Части (главы)"
-                    android:layout_marginTop="12dp"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:textColor="?attr/colorOnSurface" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvChapters"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:nestedScrollingEnabled="false" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonAddChapter"
+                    style="@style/Widget.Stepwise.Button.Outlined"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:text="Добавить часть" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/spacing_xl"
                     android:gravity="end"
-                    android:layout_marginTop="16dp">
+                    android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonCancelCreate"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Stepwise.Button.Outlined"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Отмена" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonSaveWork"
+                        style="@style/Widget.Stepwise.Button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/spacing_md"
                         android:text="Сохранить" />
                 </LinearLayout>
 

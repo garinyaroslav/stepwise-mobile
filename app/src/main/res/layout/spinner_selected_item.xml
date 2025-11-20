@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/input_min_height"
     android:gravity="center_vertical"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp">
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/spacing_base"
+    android:paddingEnd="@dimen/spacing_base">
 
     <ImageView
         android:id="@+id/ivSelectedIcon"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        app:tint="?attr/colorOnSurface"
+        android:layout_width="@dimen/icon_size_medium"
+        android:layout_height="@dimen/icon_size_medium"
         android:contentDescription="@string/spinner_icon_desc"
-        android:src="@drawable/pen" />
+        android:src="@drawable/pen"
+        app:tint="?attr/colorOnSurface" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/spacing_md"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -28,7 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Тип работы"
-            android:textAppearance="?attr/textAppearanceBody1" />
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorOnSurface" />
 
     </LinearLayout>
 

@@ -4,53 +4,51 @@
     android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
-    android:background="?attr/colorSurface">
+    android:background="@color/colorBackground"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_base">
 
         <TextView
             android:id="@+id/subtitleProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_md"
             android:text="Управляйте своей личной информацией и безопасностью"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"/>
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardProfile"
+            style="@style/Widget.Stepwise.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="0dp">
+                android:padding="@dimen/spacing_base">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingBottom="8dp">
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_md">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/avatarCard"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         app:cardCornerRadius="40dp"
-                        app:cardElevation="0dp">
+                        app:cardElevation="@dimen/card_elevation">
 
                         <ImageView
                             android:id="@+id/imageAvatar"
@@ -63,36 +61,41 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_base"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="12dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/textAccount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
                             android:text="username • email@mail.com"
-                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/textRole"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_xs"
+                            android:fontFamily="sans-serif-medium"
                             android:text="Role"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                            android:textColor="?attr/colorPrimary"
-                            android:layout_marginTop="4dp"/>
+                            android:textColor="?attr/colorPrimary" />
                     </LinearLayout>
 
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFirstName"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:hint="Имя"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etFirstName"
                         android:layout_width="match_parent"
@@ -101,11 +104,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilMiddleName"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:hint="Отчество"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etMiddleName"
                         android:layout_width="match_parent"
@@ -114,11 +119,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilLastName"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:hint="Фамилия"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etLastName"
                         android:layout_width="match_parent"
@@ -127,11 +134,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilPhone"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:hint="Номер телефона (+7... or 8...)"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPhone"
                         android:layout_width="match_parent"
@@ -141,11 +150,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilAddress"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Stepwise.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:hint="Адрес"
-                    android:layout_marginTop="8dp">
+                    app:boxBackgroundMode="outline">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etAddress"
                         android:layout_width="match_parent"
@@ -155,61 +166,62 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="12dp"
-                    android:gravity="end">
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:gravity="end"
+                    android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/buttonCancel"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Stepwise.Button.Outlined"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Отмена" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonSave"
+                        style="@style/Widget.Stepwise.Button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="Сохранить"
-                        app:cornerRadius="8dp"
-                        app:iconTint="?attr/colorOnPrimary" />
+                        android:layout_marginStart="@dimen/spacing_md"
+                        android:text="Сохранить" />
                 </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Stepwise.CardView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="0dp">
+                android:padding="@dimen/spacing_base">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Безопасность"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    android:textStyle="bold"/>
+                    android:textColor="?attr/colorOnSurface" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonResetPassword"
+                    style="@style/Widget.Stepwise.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:text="Сбросить пароль" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonLogout"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Stepwise.Button.Outlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:text="Выйти" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

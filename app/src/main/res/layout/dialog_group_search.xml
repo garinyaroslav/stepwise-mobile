@@ -1,40 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dialog_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="@dimen/spacing_xl">
 
-    <EditText
-        android:id="@+id/etSearchGroup"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Stepwise.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Поиск группы"
-        android:inputType="text"
-        android:imeOptions="actionSearch"
-        android:padding="8dp" />
+        app:boxBackgroundMode="outline"
+        app:endIconMode="clear_text"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        app:startIconTint="?attr/colorOnSurfaceVariant">
 
-    <ProgressBar
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSearchGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressGroups"
-        style="?android:attr/progressBarStyleSmall"
+        style="@style/Widget.Stepwise.CircularProgressIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:indeterminate="true"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Введите запрос для поиска"
         android:gravity="center"
-        android:padding="12dp"
+        android:padding="@dimen/spacing_xl"
+        android:text="Введите запрос для поиска"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvGroups"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="@dimen/spacing_md"
+        android:clipToPadding="false" />
 </LinearLayout>

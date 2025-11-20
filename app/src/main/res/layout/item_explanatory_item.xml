@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardItem"
+    style="@style/Widget.Stepwise.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="@dimen/spacing_md">
 
     <LinearLayout
-        android:padding="12dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_base">
 
         <TextView
             android:id="@+id/tvItemOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/tvItemTitle"
@@ -28,46 +31,51 @@
             android:id="@+id/tvItemStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textAppearance="?attr/textAppearanceBody2" />
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/tvItemComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/spacing_md"
             android:gravity="end"
-            android:layout_marginTop="8dp">
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnViewPdf"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
                 android:contentDescription="Посмотреть"
-                android:src="@drawable/eye" />
+                android:src="@drawable/eye"
+                app:tint="?attr/colorPrimary" />
 
             <ImageButton
                 android:id="@+id/btnApprove"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
                 android:contentDescription="Подтвердить"
-                android:src="@drawable/check" />
+                android:src="@drawable/check"
+                app:tint="@color/colorSuccess" />
 
             <ImageButton
                 android:id="@+id/btnReject"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
                 android:contentDescription="Отклонить"
-                android:src="@drawable/cross" />
+                android:src="@drawable/cross"
+                app:tint="?attr/colorError" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
