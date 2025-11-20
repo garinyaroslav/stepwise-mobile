@@ -1,16 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1E88E5</color>
-    <color name="colorPrimaryVariant">#1565C0</color>
+    <!-- Primary colors - Modern blue palette -->
+    <color name="colorPrimary">#2563EB</color>
+    <color name="colorPrimaryVariant">#1E40AF</color>
     <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#DBEAFE</color>
+    <color name="colorOnPrimaryContainer">#1E3A8A</color>
 
-    <color name="colorAccent">#FF4081</color>
+    <!-- Secondary colors - Complementary teal -->
+    <color name="colorSecondary">#06B6D4</color>
+    <color name="colorSecondaryVariant">#0891B2</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorSecondaryContainer">#CFFAFE</color>
+    <color name="colorOnSecondaryContainer">#164E63</color>
+
+    <!-- Accent colors -->
+    <color name="colorAccent">#8B5CF6</color>
     <color name="colorOnAccent">#FFFFFF</color>
 
+    <!-- Surface colors -->
     <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnSurface">#212121</color>
+    <color name="colorOnSurface">#1F2937</color>
+    <color name="colorSurfaceVariant">#F9FAFB</color>
+    <color name="colorOnSurfaceVariant">#6B7280</color>
 
+    <!-- Background colors -->
+    <color name="colorBackground">#F3F4F6</color>
+    <color name="colorOnBackground">#1F2937</color>
+
+    <!-- Error colors -->
+    <color name="colorError">#EF4444</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorErrorContainer">#FEE2E2</color>
+    <color name="colorOnErrorContainer">#991B1B</color>
+
+    <!-- Success colors -->
+    <color name="colorSuccess">#10B981</color>
+    <color name="colorOnSuccess">#FFFFFF</color>
+    <color name="colorSuccessContainer">#D1FAE5</color>
+    <color name="colorOnSuccessContainer">#065F46</color>
+
+    <!-- Warning colors -->
+    <color name="colorWarning">#F59E0B</color>
+    <color name="colorOnWarning">#FFFFFF</color>
+    <color name="colorWarningContainer">#FEF3C7</color>
+    <color name="colorOnWarningContainer">#92400E</color>
+
+    <!-- Outline and divider -->
+    <color name="colorOutline">#E5E7EB</color>
+    <color name="colorOutlineVariant">#F3F4F6</color>
+
+    <!-- Alpha variations -->
     <color name="alpha_on_surface_60">#99000000</color>
+    <color name="alpha_on_surface_38">#61000000</color>
+    <color name="alpha_on_surface_12">#1F000000</color>
     <color name="bottom_nav_inactive">#99000000</color>
-    <color name="colorOutline">#1F000000</color>
+
+    <!-- Scrim -->
+    <color name="scrim">#80000000</color>
 </resources>
