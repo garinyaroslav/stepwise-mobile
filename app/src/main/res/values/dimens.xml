@@ -1,5 +1,4 @@
 <resources>
-    <!-- Modern spacing scale based on 4dp grid -->
     <dimen name="spacing_xs">4dp</dimen>
     <dimen name="spacing_sm">8dp</dimen>
     <dimen name="spacing_md">12dp</dimen>
@@ -10,39 +9,31 @@
     <dimen name="spacing_3xl">40dp</dimen>
     <dimen name="spacing_4xl">48dp</dimen>
 
-    <!-- Default screen margins -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <!-- Card dimensions -->
     <dimen name="card_corner_radius">16dp</dimen>
     <dimen name="card_corner_radius_small">12dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="card_elevation_raised">4dp</dimen>
 
-    <!-- Button dimensions -->
     <dimen name="button_corner_radius">12dp</dimen>
     <dimen name="button_height">48dp</dimen>
     <dimen name="button_padding_horizontal">24dp</dimen>
     <dimen name="button_padding_vertical">12dp</dimen>
 
-    <!-- Input field dimensions -->
     <dimen name="input_corner_radius">12dp</dimen>
     <dimen name="input_min_height">56dp</dimen>
 
-    <!-- List item dimensions -->
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_item_vertical_spacing">8dp</dimen>
     <dimen name="list_item_horizontal_spacing">16dp</dimen>
 
-    <!-- Icon sizes -->
     <dimen name="icon_size_small">20dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
     <dimen name="icon_size_large">32dp</dimen>
 
-    <!-- Bottom navigation -->
     <dimen name="bottom_nav_height">56dp</dimen>
 
-    <!-- FAB -->
     <dimen name="fab_margin">16dp</dimen>
 </resources>

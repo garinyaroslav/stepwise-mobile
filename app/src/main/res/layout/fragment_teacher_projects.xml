@@ -4,7 +4,7 @@
     android:id="@+id/teacherProjectsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorBackground">
+    android:background="@color/colorBackground">
 
     <LinearLayout
         android:id="@+id/topContainer"
@@ -23,8 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Группа"
-            app:boxBackgroundMode="outline"
-            app:endIconMode="dropdown_menu">
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etGroupFilter"
@@ -48,7 +47,7 @@
         <ImageButton
             android:id="@+id/btnRefresh"
             android:layout_width="@dimen/button_height"
-            android:layout_height="@dimen:button_height"
+            android:layout_height="@dimen/button_height"
             android:layout_marginStart="@dimen/spacing_sm"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Обновить"
