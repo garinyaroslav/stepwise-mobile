@@ -135,4 +135,15 @@
         <item name="trackThickness">4dp</item>
         <item name="trackCornerRadius">2dp</item>
     </style>
+
+    <style name="StepwiseMaterialAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Stepwise.RoundedDialog</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Stepwise.RoundedDialog</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Stepwise.RoundedDialog</item>
+    </style>
+
+    <style name="ShapeAppearance.Stepwise.RoundedDialog" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
 </resources>

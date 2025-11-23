@@ -3,20 +3,23 @@ package com.github.stepwise.ui.profile
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.stepwise.MainActivity
+import com.github.stepwise.R
 import com.github.stepwise.databinding.FragmentProfileBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.AuthInterceptor
 import com.github.stepwise.network.models.ProfileReq
 import com.github.stepwise.network.models.ResetPasswordDto
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,7 +30,6 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var argUserId: Long = -1L
-
     private var myEmail: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +39,9 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+    ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,74 +51,101 @@ class ProfileFragment : Fragment() {
 
         binding.buttonCancel.setOnClickListener { loadProfile() }
         binding.buttonSave.setOnClickListener { saveProfile() }
-        binding.buttonResetPassword.setOnClickListener { showResetPasswordDialog() }
-
+        binding.buttonResetPassword.setOnClickListener { showRequestResetDialog() }
         binding.buttonLogout.setOnClickListener { performLogout() }
 
         loadProfile()
     }
 
-    private fun isValidPassword(pw: String): Boolean {
-        if (pw.length < 8) return false
-        val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=]).{8,}$")
-        return regex.matches(pw)
+
+    private fun isValidPassword(pass: String): Boolean {
+        val regex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#\$%^&+=]).{8,}$")
+        return regex.matches(pass)
     }
 
-    private fun showResetPasswordDialog() {
-        val options = arrayOf("Запросить ссылку сброса по email", "Ввести код и новый пароль")
-        AlertDialog.Builder(requireContext())
-            .setTitle("Сброс пароля")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> promptForEmailAndRequestReset()
-                    1 -> promptForTokenAndNewPassword()
-                }
-            }
-            .setNegativeButton("Отмена", null)
-            .show()
-    }
+    private fun isValidEmail(email: String): Boolean =
+        Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    private fun promptForEmailAndRequestReset() {
-        val input = EditText(requireContext()).apply {
-            hint = "Email"
-            inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            setText(myEmail ?: "")
+
+    private fun showRequestResetDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_request_reset, null)
+        val etEmail = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etEmailInput)
+
+        val current = myEmail?.trim().takeUnless { it.isNullOrBlank() }
+            ?: myEmail
+            ?: ""
+
+        if (!current.isNullOrBlank()) {
+            etEmail.setText(current)
         }
-        AlertDialog.Builder(requireContext())
-            .setTitle("Запросить ссылку сброса")
-            .setView(input)
-            .setPositiveButton("Отправить") { _, _ ->
-                val email = input.text?.toString()?.trim().orEmpty()
+
+        val alert = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Восстановление пароля")
+            .setView(dialogView)
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Отправить", null)
+            .create()
+
+        alert.setOnShowListener {
+            alert.window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
+            )
+
+            val btnPositive = alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            btnPositive.setOnClickListener {
+                val email = etEmail.text?.toString()?.trim().orEmpty()
                 if (email.isBlank()) {
                     Toast.makeText(requireContext(), "Введите email", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+                    return@setOnClickListener
                 }
-                requestPasswordReset(email)
+                if (!isValidEmail(email)) {
+                    Toast.makeText(requireContext(), "Некорректный email", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                btnPositive.isEnabled = false
+                requestPasswordReset(
+                    email,
+                    onDone = {
+                        btnPositive.isEnabled = true
+                        alert.dismiss()
+                        myEmail = email
+                        promptForTokenAndNewPassword(email)
+                    },
+                    onError = {
+                        btnPositive.isEnabled = true
+                    }
+                )
             }
-            .setNegativeButton("Отмена", null)
-            .show()
+        }
+
+        alert.show()
     }
 
-    private fun promptForTokenAndNewPassword() {
-        val container = layoutInflater.inflate(com.github.stepwise.R.layout.dialog_token_new_password, null)
-        val etEmail = container.findViewById<EditText>(com.github.stepwise.R.id.etEmail)
-        val etToken = container.findViewById<EditText>(com.github.stepwise.R.id.etToken)
-        val etNew = container.findViewById<EditText>(com.github.stepwise.R.id.etNewPassword)
-        val etConfirm = container.findViewById<EditText>(com.github.stepwise.R.id.etConfirmPassword)
+    private fun promptForTokenAndNewPassword(email: String) {
+        val container = layoutInflater.inflate(R.layout.dialog_token_new_password, null)
+        val etEmail = container.findViewById<EditText>(R.id.etEmail)
+        val etToken = container.findViewById<EditText>(R.id.etToken)
+        val etNew = container.findViewById<EditText>(R.id.etNewPassword)
+        val etConfirm = container.findViewById<EditText>(R.id.etConfirmPassword)
 
-        etEmail.setText(myEmail ?: "")
+        etEmail.setText(email)
         etEmail.isEnabled = false
         etEmail.isFocusable = false
 
-        val builder = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Ввести код и новый пароль")
             .setView(container)
             .setNegativeButton("Отмена", null)
             .setPositiveButton("Сменить", null)
+            .create()
 
-        val dialog = builder.create()
         dialog.setOnShowListener {
-            val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            dialog.window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
+            )
+
+            val positive = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
             positive.setOnClickListener {
                 val token = etToken.text?.toString()?.trim().orEmpty()
                 val newPass = etNew.text?.toString()?.trim().orEmpty()
@@ -129,98 +160,93 @@ class ProfileFragment : Fragment() {
                     return@setOnClickListener
                 }
                 if (!isValidPassword(newPass)) {
-                    Toast.makeText(requireContext(),
+                    Toast.makeText(
+                        requireContext(),
                         "Пароль не соответствует требованиям: минимум 8 символов, одна заглавная, одна строчная, одна цифра и один спецсимвол.",
-                        Toast.LENGTH_LONG).show()
+                        Toast.LENGTH_LONG
+                    ).show()
                     return@setOnClickListener
                 }
 
                 positive.isEnabled = false
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        val dto = ResetPasswordDto(token = token, newPassword = newPass)
-                        val resp = ApiClient.apiService.resetPassword(dto)
-
-                        withContext(Dispatchers.Main) {
-                            positive.isEnabled = true
-                            if (resp.isSuccessful) {
-                                Toast.makeText(requireContext(), "Пароль успешно изменён", Toast.LENGTH_LONG).show()
-                                dialog.dismiss()
-                            } else {
-                                val errMsg = try {
-                                    resp.errorBody()?.string()?.takeIf { it.isNotBlank() } ?: "Ошибка: ${resp.code()}"
-                                } catch (t: Throwable) {
-                                    "Ошибка: ${resp.code()}"
-                                }
-                                Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        withContext(Dispatchers.Main) {
-                            positive.isEnabled = true
-                            Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                        }
+                performPasswordReset(
+                    token,
+                    newPass,
+                    onSuccess = {
+                        positive.isEnabled = true
+                        Toast.makeText(requireContext(), "Пароль успешно изменён", Toast.LENGTH_LONG).show()
+                        dialog.dismiss()
+                    },
+                    onError = {
+                        positive.isEnabled = true
                     }
-                }
+                )
             }
         }
 
         dialog.show()
     }
-    private fun requestPasswordReset(email: String) {
-        binding.buttonResetPassword.isEnabled = false
+
+    private fun requestPasswordReset(
+        email: String,
+        onDone: () -> Unit,
+        onError: () -> Unit
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val resp = ApiClient.apiService.requestPasswordReset(email)
                 withContext(Dispatchers.Main) {
-                    binding.buttonResetPassword.isEnabled = true
                     if (resp.isSuccessful) {
-                        Toast.makeText(requireContext(), "Ссылка сброса отправлена на $email", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Ссылка/код отправлен на $email", Toast.LENGTH_LONG).show()
+                        onDone()
                     } else {
                         Toast.makeText(requireContext(), "Ошибка запроса: ${resp.code()}", Toast.LENGTH_LONG).show()
+                        onError()
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    binding.buttonResetPassword.isEnabled = true
                     Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                    onError()
                 }
             }
         }
     }
 
-    private fun performPasswordReset(token: String, newPassword: String) {
-        binding.buttonResetPassword.isEnabled = false
+    private fun performPasswordReset(
+        token: String,
+        newPassword: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val dto = ResetPasswordDto(token = token, newPassword = newPassword)
                 val resp = ApiClient.apiService.resetPassword(dto)
-
                 withContext(Dispatchers.Main) {
-                    binding.buttonResetPassword.isEnabled = true
                     if (resp.isSuccessful) {
-                        Toast.makeText(requireContext(), "Пароль успешно изменён", Toast.LENGTH_LONG).show()
+                        onSuccess()
                     } else {
                         val errMsg = try {
                             resp.errorBody()?.string()?.takeIf { it.isNotBlank() } ?: "Ошибка: ${resp.code()}"
-                        } catch (t: Throwable) {
+                        } catch (_: Throwable) {
                             "Ошибка: ${resp.code()}"
                         }
                         Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
+                        onError()
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    binding.buttonResetPassword.isEnabled = true
                     Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                    onError()
                 }
             }
         }
     }
+
     private fun performLogout() {
         val prefs = requireActivity().getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE)
         prefs.edit().remove("token").remove("role").apply()
@@ -253,7 +279,9 @@ class ProfileFragment : Fragment() {
                 if (resp.isSuccessful) {
                     val p = resp.body()
                     myEmail = p?.email
-                    val role = requireActivity().getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE).getString("role", "Student")
+                    val role = requireActivity()
+                        .getSharedPreferences("stepwise_prefs", Context.MODE_PRIVATE)
+                        .getString("role", "Student")
                     withContext(Dispatchers.Main) {
                         binding.textRole.text = if (role == "STUDENT") "Студент" else "Преподаватель"
                         binding.etFirstName.setText(p?.firstName ?: "")
@@ -296,7 +324,14 @@ class ProfileFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val dto = ProfileReq(id = null, firstName = first, lastName = last, middleName = if (middle.isBlank()) null else middle, phoneNumber = phone, address = address)
+                val dto = ProfileReq(
+                    id = null,
+                    firstName = first,
+                    lastName = last,
+                    middleName = if (middle.isBlank()) null else middle,
+                    phoneNumber = phone,
+                    address = address
+                )
                 val resp = ApiClient.apiService.updateProfile(dto)
                 withContext(Dispatchers.Main) {
                     binding.buttonSave.isEnabled = true
