@@ -26,6 +26,17 @@ class StudentsProjectsAdapter(
             override fun areContentsTheSame(oldItem: ProjectResponseDto, newItem: ProjectResponseDto): Boolean =
                 oldItem == newItem
         }
+
+        private fun pluralizePunkt(count: Int): String {
+            val mod100 = count % 100
+            val mod10 = count % 10
+            return when {
+                mod100 in 11..14 -> "пунктов"
+                mod10 == 1 -> "пункт"
+                mod10 in 2..4 -> "пункта"
+                else -> "пунктов"
+            }
+        }
     }
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
@@ -38,46 +49,54 @@ class StudentsProjectsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_student_project, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_student_project, parent, false)
         return VH(v)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val project = getItem(position)
+
         holder.tvTitle.text = project.title ?: "Проект"
+        holder.tvDesc.text = project.description.orEmpty()
+
         val owner = project.owner
-        holder.tvStudent.text = if (owner != null) {
-            listOfNotNull(owner.firstName, owner.lastName).joinToString(" ")
-        } else {
-            project.owner?.email ?: "Студент"
+        holder.tvStudent.text = when {
+            owner != null -> listOfNotNull(owner.firstName, owner.lastName).joinToString(" ").ifBlank {
+                owner.email ?: "Студент"
+            }
+            else -> "Студент"
         }
-        holder.tvDesc.text = project.description ?: ""
 
         val items: List<ExplanatoryNoteItemResponseDto> = project.items ?: emptyList()
-        holder.tvCounts.text = "${items.size} пункт(ов)"
+        val count = items.size
+        holder.tvCounts.text = "Прикреплено $count ${pluralizePunkt(count)}"
 
         holder.chipGroup.removeAllViews()
 
         if (items.isNotEmpty()) {
             val last = items.maxByOrNull { it.submittedAt ?: it.draftedAt ?: "" }
-            val statusChip = Chip(holder.itemView.context)
-            statusChip.isClickable = false
-            statusChip.text = last?.status?.name ?: "—"
+            val statusChip = Chip(holder.itemView.context).apply {
+                isClickable = false
+                text = last?.status?.name ?: "—"
+            }
             holder.chipGroup.addView(statusChip)
-        } else {
-            val chip = Chip(holder.itemView.context)
-            chip.isClickable = false
-            chip.text = "Нет прикреплённых пунктов"
-            holder.chipGroup.addView(chip)
         }
 
-        val approvedChip = Chip(holder.itemView.context)
-        approvedChip.isClickable = false
-        approvedChip.text = if (project.isApprovedForDefense) "Допущен к защите" else "Не допущен"
+        val approvedChip = Chip(holder.itemView.context).apply {
+            isClickable = false
+            text = if (project.isApprovedForDefense) "Допущен к защите" else "Не допущен"
+        }
         holder.chipGroup.addView(approvedChip)
 
-        holder.card.setOnClickListener {
-            onOpenProject(project)
+        if (items.isEmpty()) {
+            val emptyChip = Chip(holder.itemView.context).apply {
+                isClickable = false
+                text = "Нет пунктов"
+            }
+            holder.chipGroup.addView(emptyChip, 0)
         }
+
+        holder.card.setOnClickListener { onOpenProject(project) }
     }
 }

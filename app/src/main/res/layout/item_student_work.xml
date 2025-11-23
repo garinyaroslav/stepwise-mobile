@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardWork"
-    style="@style/Widget.Stepwise.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_md"
-    android:foreground="?attr/selectableItemBackground">
+    android:layout_marginVertical="@dimen/spacing_sm"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,24 +19,42 @@
             android:id="@+id/tvWorkTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:textAppearance="?attr/textAppearanceHeadline6"
-            android:textColor="?attr/colorOnSurface" />
+            android:text="Работа"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:fontFamily="sans-serif-medium" />
 
         <TextView
             android:id="@+id/tvWorkMeta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"
+            android:text="Группа · Преподаватель"
             android:textAppearance="?attr/textAppearanceCaption"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/workProgress"
-            style="@style/Widget.Stepwise.LinearProgressIndicator"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md" />
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/workProgress"
+                style="@style/Widget.Stepwise.LinearProgressIndicator"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvWorkProgressLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:text="0 / 0"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
 
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

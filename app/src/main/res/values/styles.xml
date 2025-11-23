@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Text Input Layout Styles -->
     <style name="Widget.Stepwise.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">?attr/colorPrimary</item>
         <item name="boxStrokeWidth">2dp</item>
@@ -22,7 +21,6 @@
         <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <!-- Button Styles -->
     <style name="Widget.Stepwise.Button" parent="Widget.MaterialComponents.Button">
         <item name="cornerRadius">@dimen/button_corner_radius</item>
         <item name="android:paddingStart">@dimen/button_padding_horizontal</item>
@@ -64,15 +62,11 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <!-- Material Button (legacy support) -->
     <style name="Widget.Stepwise.MaterialButton" parent="Widget.Stepwise.Button" />
 
-    <!-- Card View Styles -->
     <style name="Widget.Stepwise.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">@dimen/card_corner_radius</item>
-        <item name="cardElevation">@dimen/card_elevation</item>
-        <item name="cardUseCompatPadding">true</item>
-        <item name="contentPadding">@dimen/spacing_base</item>
+        <item name="contentPadding">@dimen/spacing_md</item>
         <item name="strokeWidth">0dp</item>
         <item name="cardBackgroundColor">?attr/colorSurface</item>
     </style>
@@ -87,7 +81,6 @@
         <item name="cardElevation">@dimen/card_elevation_raised</item>
     </style>
 
-    <!-- Chip Styles -->
     <style name="Widget.Stepwise.Chip" parent="Widget.MaterialComponents.Chip.Action">
         <item name="chipCornerRadius">8dp</item>
         <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
@@ -105,7 +98,6 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <!-- FAB Styles -->
     <style name="Widget.Stepwise.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Stepwise.FAB</item>
         <item name="backgroundTint">?attr/colorPrimary</item>
@@ -120,7 +112,6 @@
         <item name="cornerSize">16dp</item>
     </style>
 
-    <!-- Bottom Navigation -->
     <style name="Widget.Stepwise.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="itemIconTint">@color/bottom_nav_color_state</item>
         <item name="itemTextColor">@color/bottom_nav_color_state</item>
@@ -133,7 +124,6 @@
         <item name="android:color">?attr/colorPrimaryContainer</item>
     </style>
 
-    <!-- Progress Indicator -->
     <style name="Widget.Stepwise.CircularProgressIndicator" parent="Widget.MaterialComponents.CircularProgressIndicator">
         <item name="indicatorColor">?attr/colorPrimary</item>
         <item name="trackThickness">4dp</item>

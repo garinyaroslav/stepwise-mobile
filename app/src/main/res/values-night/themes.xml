@@ -2,52 +2,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Stepwisemobile" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
 
-        <!-- Secondary colors -->
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
-        <!-- Surface colors -->
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
 
-        <!-- Background colors -->
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="colorOnBackground">@color/colorOnBackground</item>
 
-        <!-- Error colors -->
         <item name="colorError">@color/colorError</item>
         <item name="colorOnError">@color/colorOnError</item>
 
-        <!-- Status bar -->
         <item name="android:statusBarColor">@color/colorPrimaryVariant</item>
         <item name="android:windowLightStatusBar">false</item>
 
-        <!-- Navigation bar -->
         <item name="android:navigationBarColor">@color/colorSurface</item>
         <item name="android:windowLightNavigationBar">false</item>
 
-        <!-- Shape appearances -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Stepwise.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Stepwise.MediumComponent</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Stepwise.LargeComponent</item>
 
-        <!-- Material button style -->
         <item name="materialButtonStyle">@style/Widget.Stepwise.Button</item>
         
-        <!-- Text input layout style -->
         <item name="textInputStyle">@style/Widget.Stepwise.TextInputLayout</item>
 
-        <!-- Card style -->
         <item name="materialCardViewStyle">@style/Widget.Stepwise.CardView</item>
     </style>
 

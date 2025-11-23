@@ -12,8 +12,16 @@ import com.github.stepwise.R
 import com.github.stepwise.network.models.WorkResponseDto
 import com.google.android.material.progressindicator.LinearProgressIndicator
 
-class StudentWorksAdapter(private val onOpen: (WorkResponseDto) -> Unit) :
-    ListAdapter<WorkResponseDto, StudentWorksAdapter.VH>(DIFF) {
+data class WorkProgressStats(
+    val approved: Int,
+    val total: Int
+)
+
+class StudentWorksAdapter(
+    private val onOpen: (WorkResponseDto) -> Unit
+) : ListAdapter<WorkResponseDto, StudentWorksAdapter.VH>(DIFF) {
+
+    private var progressStats: Map<Long, WorkProgressStats> = emptyMap()
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<WorkResponseDto>() {
@@ -29,23 +37,49 @@ class StudentWorksAdapter(private val onOpen: (WorkResponseDto) -> Unit) :
         val card: CardView = view.findViewById(R.id.cardWork)
         val tvTitle: TextView = view.findViewById(R.id.tvWorkTitle)
         val tvMeta: TextView = view.findViewById(R.id.tvWorkMeta)
+        val tvProgressLabel: TextView = view.findViewById(R.id.tvWorkProgressLabel)
         val progress: LinearProgressIndicator = view.findViewById(R.id.workProgress)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_student_work, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_student_work, parent, false)
         return VH(v)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val work = getItem(position)
         holder.tvTitle.text = work.title ?: "Работа"
-        holder.tvMeta.text = "${work.groupName ?: ""} · ${work.teacherName ?: work.teacherEmail ?: ""}"
 
-        val total = work.countOfChapters ?: 0
-        holder.progress.max = if (total > 0) total else 100
-        holder.progress.progress = 0
+        val teacherName = buildTeacherFullName(work)
+        val teacherDisplay = teacherName ?: (work.teacherEmail ?: "")
+        holder.tvMeta.text = "${work.groupName ?: ""} · $teacherDisplay".trim().trim('·',' ')
+
+        val totalChapters = work.countOfChapters ?: 0
+        val stats = work.id?.let { progressStats[it] }
+
+        val approved = stats?.approved ?: 0
+        val total = stats?.total ?: totalChapters
+
+        holder.progress.max = if (total > 0) total else 1
+        holder.progress.progress = approved.coerceAtMost(holder.progress.max)
+
+        holder.tvProgressLabel.text = "$approved / $total"
 
         holder.card.setOnClickListener { onOpen(work) }
+    }
+
+    fun updateProgressStats(map: Map<Long, WorkProgressStats>) {
+        progressStats = map
+        notifyDataSetChanged()
+    }
+
+    private fun buildTeacherFullName(work: WorkResponseDto): String? {
+        val last = work.teacherLastName?.trim().takeIf { !it.isNullOrBlank() }
+        val first = work.teacherName?.trim().takeIf { !it.isNullOrBlank() }
+        val middle = work.teacherMiddleName?.trim().takeIf { !it.isNullOrBlank() }
+        return if (last != null && first != null && middle != null) {
+            "$last $first $middle"
+        } else null
     }
 }

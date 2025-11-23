@@ -49,7 +49,7 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Закрыть"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:src="@drawable/close"
             app:tint="?attr/colorOnSurface" />
     </LinearLayout>
 

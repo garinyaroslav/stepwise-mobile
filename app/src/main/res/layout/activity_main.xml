@@ -10,6 +10,8 @@
         style="@style/Widget.Stepwise.MaterialToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.Stepwise.Toolbar"
+        app:popupTheme="@style/ThemeOverlay.Stepwise.Toolbar"
         app:layout_scrollFlags="scroll|enterAlways" />
 
     <fragment
