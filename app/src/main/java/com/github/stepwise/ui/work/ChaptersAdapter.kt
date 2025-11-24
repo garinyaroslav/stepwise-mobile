@@ -109,7 +109,6 @@ class ChaptersAdapter(
             holder.card.strokeWidth = 2
         } catch (_: Exception) {  }
 
-        // buttons
         holder.btnRemove.setOnClickListener { onRemove(position) }
         holder.btnPick.setOnClickListener { onPickDate(position) }
     }

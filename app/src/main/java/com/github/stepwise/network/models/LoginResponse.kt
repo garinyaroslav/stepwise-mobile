@@ -1,19 +1,17 @@
 package com.github.stepwise.network.models
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
-data class LoginResponse(
-    @SerializedName("user")
-    val user: User? = null,
-
-    @SerializedName("token")
-    val token: String? = null
-) {
+@Serializable
+data class UserShort(
+    val id: Long?,
     val role: String?
-        get() = user?.role
-}
+)
 
-data class User(
-    @SerializedName("role")
-    val role: String? = null
+@Serializable
+data class LoginResponse(
+    val user: UserShort? = null,
+    val token: String? = null,
+    val role: String? = null,
+    val temporaryPassword: Boolean? = null
 )

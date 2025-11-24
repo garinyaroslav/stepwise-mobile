@@ -35,7 +35,6 @@ class GroupSearchDialog : DialogFragment() {
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
 
         adapter = GroupSearchAdapter(emptyList()) { group ->
-            // return selection to parent via FragmentResult API
             setFragmentResult("group_selected", bundleOf("groupId" to group.id, "groupName" to group.name))
             dismiss()
         }
@@ -66,7 +65,7 @@ class GroupSearchDialog : DialogFragment() {
                     return
                 }
                 searchJob = coroutineScope.launch {
-                    delay(300) // debounce
+                    delay(300)
                     setLoading(true)
                     setEmpty(false)
                     try {

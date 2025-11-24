@@ -1,34 +1,39 @@
 package com.github.stepwise.ui.login
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.github.stepwise.StudentActivity
 import com.github.stepwise.TeacherActivity
 import com.github.stepwise.databinding.FragmentLoginBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.LoginRequest
 import com.github.stepwise.network.models.LoginResponse
-import com.github.stepwise.network.models.ResetPasswordDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import android.util.Patterns
-import androidx.core.content.ContextCompat
-import com.github.stepwise.R
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
 private const val TAG = "LoginFragment"
+private const val CHANNEL_ID = "stepwise_alerts"
+private const val NOTIFICATION_ID_TEMP_PW = 1001
 
 class LoginFragment : Fragment() {
 
@@ -36,6 +41,13 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val prefsName = "stepwise_prefs"
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (!isGranted) {
+                Toast.makeText(requireContext(), "Разрешение на уведомления не предоставлено", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,10 +72,6 @@ class LoginFragment : Fragment() {
             }
             doLogin(username, password)
         }
-
-        binding.textForgot.setOnClickListener {
-            showRequestResetDialog()
-        }
     }
 
     private fun doLogin(username: String, password: String) {
@@ -84,6 +92,20 @@ class LoginFragment : Fragment() {
                         if (body != null && body.token != null) {
                             val roleFromServer = body.role ?: body.user?.role ?: "STUDENT"
                             saveAuth(body.token, roleFromServer)
+
+                            if (body.temporaryPassword == true) {
+                                createNotificationChannelIfNeeded()
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    val has = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+                                    if (!has) {
+                                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                }
+
+                                showTemporaryPasswordNotification(roleFromServer)
+                            }
+
                             startRoleActivity(roleFromServer)
                         } else {
                             Toast.makeText(requireContext(), "Неверный ответ сервера", Toast.LENGTH_SHORT).show()
@@ -108,6 +130,58 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun showTemporaryPasswordNotification(role: String) {
+        val ctx = requireContext().applicationContext
+
+        val targetIntent = when (role.uppercase()) {
+            "STUDENT" -> Intent(ctx, StudentActivity::class.java)
+            "TEACHER" -> Intent(ctx, TeacherActivity::class.java)
+            else -> Intent(ctx, StudentActivity::class.java)
+        }.apply {
+            putExtra("openProfile", true)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_UPDATE_CURRENT
+        val pendingIntent = PendingIntent.getActivity(ctx, 0, targetIntent, pendingFlags)
+
+        val title = "Внимание!"
+        val text = "Вы используете временный пароль, пожалуйста перейдите в профиль и замените пароль."
+
+        val builder = NotificationCompat.Builder(ctx, CHANNEL_ID)
+            .setSmallIcon(com.github.stepwise.R.drawable.primary_logo)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        with(NotificationManagerCompat.from(ctx)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    Log.w(TAG, "POST_NOTIFICATIONS permission not granted — notification not shown")
+                    return
+                }
+            }
+            notify(NOTIFICATION_ID_TEMP_PW, builder.build())
+        }
+    }
+
+    private fun createNotificationChannelIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Stepwise уведомления"
+            val descriptionText = "Канал для важных уведомлений приложения Stepwise"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     private fun saveAuth(token: String, role: String) {
         val prefs = requireActivity().getSharedPreferences(prefsName, Context.MODE_PRIVATE)
         prefs.edit().putString("token", token).putString("role", role).apply()
@@ -123,187 +197,6 @@ class LoginFragment : Fragment() {
         }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-    }
-
-    private fun isValidPassword(pass: String): Boolean {
-        val regex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#\$%^&+=]).{8,}$")
-        return regex.matches(pass)
-    }
-
-    private fun isValidEmail(email: String): Boolean =
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
-
-    private fun showRequestResetDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_request_reset, null)
-        val etEmail = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
-            R.id.etEmailInput
-        )
-
-        val current = binding.editTextUsername.text?.toString()?.trim()
-        if (!current.isNullOrBlank()) {
-            etEmail.setText(current)
-        }
-
-        val alert = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Восстановление пароля")
-            .setView(dialogView)
-            .setNegativeButton("Отмена", null)
-            .setPositiveButton("Отправить", null)
-            .create()
-
-        alert.setOnShowListener {
-            alert.window?.setBackgroundDrawable(
-                ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
-            )
-
-            val btnPositive = alert.getButton(AlertDialog.BUTTON_POSITIVE)
-            btnPositive.setOnClickListener {
-                val email = etEmail.text?.toString()?.trim().orEmpty()
-                if (email.isBlank()) {
-                    Toast.makeText(requireContext(), "Введите email", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                if (!isValidEmail(email)) {
-                    Toast.makeText(requireContext(), "Некорректный email", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
-                btnPositive.isEnabled = false
-                requestPasswordReset(
-                    email,
-                    onDone = {
-                        btnPositive.isEnabled = true
-                        alert.dismiss()
-                        promptForTokenAndNewPassword(email)
-                    },
-                    onError = {
-                        btnPositive.isEnabled = true
-                    }
-                )
-            }
-        }
-
-        alert.show()
-    }
-    private fun promptForTokenAndNewPassword(email: String) {
-        val container = layoutInflater.inflate(R.layout.dialog_token_new_password, null)
-        val etEmail = container.findViewById<EditText>(R.id.etEmail)
-        val etToken = container.findViewById<EditText>(R.id.etToken)
-        val etNew = container.findViewById<EditText>(R.id.etNewPassword)
-        val etConfirm = container.findViewById<EditText>(R.id.etConfirmPassword)
-
-        etEmail.setText(email)
-        etEmail.isEnabled = false
-        etEmail.isFocusable = false
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Ввести код и новый пароль")
-            .setView(container)
-            .setNegativeButton("Отмена", null)
-            .setPositiveButton("Сменить", null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.window?.setBackgroundDrawable(
-                ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
-            )
-
-            val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            positive.setOnClickListener {
-                val token = etToken.text?.toString()?.trim().orEmpty()
-                val newPass = etNew.text?.toString()?.trim().orEmpty()
-                val confirm = etConfirm.text?.toString()?.trim().orEmpty()
-
-                if (token.isBlank() || newPass.isBlank() || confirm.isBlank()) {
-                    Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                if (newPass != confirm) {
-                    Toast.makeText(requireContext(), "Пароли не совпадают", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                if (!isValidPassword(newPass)) {
-                    Toast.makeText(requireContext(),
-                        "Пароль не соответствует требованиям: минимум 8 символов, одна заглавная, одна строчная, одна цифра и один спецсимвол.",
-                        Toast.LENGTH_LONG).show()
-                    return@setOnClickListener
-                }
-
-                positive.isEnabled = false
-                performPasswordReset(token, newPass,
-                    onSuccess = {
-                        positive.isEnabled = true
-                        Toast.makeText(requireContext(), "Пароль успешно изменён", Toast.LENGTH_LONG).show()
-                        dialog.dismiss()
-                    },
-                    onError = {
-                        positive.isEnabled = true
-                    }
-                )
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun requestPasswordReset(
-        email: String,
-        onDone: () -> Unit,
-        onError: () -> Unit
-    ) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val resp = ApiClient.apiService.requestPasswordReset(email)
-                withContext(Dispatchers.Main) {
-                    if (resp.isSuccessful) {
-                        Toast.makeText(requireContext(), "Ссылка/код отправлен на $email", Toast.LENGTH_LONG).show()
-                        onDone()
-                    } else {
-                        Toast.makeText(requireContext(), "Ошибка запроса: ${resp.code()}", Toast.LENGTH_LONG).show()
-                        onError()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                    onError()
-                }
-            }
-        }
-    }
-
-    private fun performPasswordReset(
-        token: String,
-        newPassword: String,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val dto = ResetPasswordDto(token = token, newPassword = newPassword)
-                val resp = ApiClient.apiService.resetPassword(dto)
-                withContext(Dispatchers.Main) {
-                    if (resp.isSuccessful) {
-                        onSuccess()
-                    } else {
-                        val errMsg = try {
-                            resp.errorBody()?.string()?.takeIf { it.isNotBlank() } ?: "Ошибка: ${resp.code()}"
-                        } catch (t: Throwable) {
-                            "Ошибка: ${resp.code()}"
-                        }
-                        Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
-                        onError()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Ошибка сети: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                    onError()
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {
