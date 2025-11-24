@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.stepwise.databinding.FragmentProjectDetailBottomSheetBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
+import com.github.stepwise.network.models.ItemStatus
 import com.github.stepwise.network.models.RejectItemDto
 import com.github.stepwise.network.models.WorkChapterDto
 import com.github.stepwise.network.models.WorkResponseDto
@@ -180,7 +181,7 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                 val items: List<ExplanatoryNoteItemResponseDto> =
                     (project.items ?: emptyList()).sortedBy { it.orderNumber ?: Int.MAX_VALUE }
 
-                val allApproved = items.isNotEmpty() && items.all { it.status?.name == "APPROVED" }
+                val allApproved = items.isNotEmpty() && items.all { it.status == ItemStatus.APPROVED }
                 val canShowApproveProject = !isApprovedForDefense && allApproved
 
                 withContext(Dispatchers.Main) {

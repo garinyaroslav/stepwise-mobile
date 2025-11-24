@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.stepwise.R
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
+import com.github.stepwise.network.models.ItemStatus
 import com.github.stepwise.network.models.WorkChapterDto
 import formatIsoToDdMmYyyy
 import java.time.LocalDateTime
@@ -82,7 +83,7 @@ class ProjectChaptersAdapter(
         val status = item?.status?.name
         val approved = status == "APPROVED"
         holder.tvDeadline.setTextColor(if (overdue && !approved) Color.RED else Color.DKGRAY)
-        holder.tvStatus.text = status ?: "Не прикреплён"
+        holder.tvStatus.text = item?.status?.russian() ?: "Не прикреплён"
 
         holder.btnAttach.visibility = View.GONE
         holder.btnView.visibility = View.GONE
@@ -102,12 +103,11 @@ class ProjectChaptersAdapter(
                 }
             }
 
-            status == "DRAFT" -> {
+            item.status == ItemStatus.DRAFT -> {
                 if (isFirstAttachable) {
                     holder.btnAttach.visibility = View.VISIBLE
                     holder.btnAttach.text = if (hasFile) "Заменить" else "Загрузить"
                     if (hasFile) holder.btnView.visibility = View.VISIBLE
-
                     holder.btnSubmit.visibility = View.VISIBLE
                     holder.btnSubmit.isEnabled = hasFile
                 } else {
@@ -115,15 +115,15 @@ class ProjectChaptersAdapter(
                 }
             }
 
-            status == "SUBMITTED" -> {
+            item.status == ItemStatus.SUBMITTED -> {
                 if (hasFile) holder.btnView.visibility = View.VISIBLE
             }
 
-            status == "APPROVED" -> {
+            item.status == ItemStatus.APPROVED -> {
                 if (hasFile) holder.btnView.visibility = View.VISIBLE
             }
 
-            status == "REJECTED" -> {
+            item.status == ItemStatus.REJECTED -> {
                 if (isFirstAttachable) {
                     holder.btnAttach.visibility = View.VISIBLE
                     holder.btnAttach.text = "Заменить"
@@ -138,7 +138,6 @@ class ProjectChaptersAdapter(
                 }
             }
         }
-
         holder.btnAttach.setOnClickListener { onAttach(chapter.index) }
         holder.btnView.setOnClickListener { onView(item) }
         holder.btnSubmit.setOnClickListener {

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.stepwise.R
 import com.github.stepwise.databinding.FragmentStudentProjectsBinding
 import com.github.stepwise.network.ApiClient
+import com.github.stepwise.network.models.ItemStatus
 import com.github.stepwise.network.models.ProjectResponseDto
 import com.github.stepwise.network.models.WorkResponseDto
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +90,7 @@ class StudentProjectsFragment : Fragment() {
                     val approvedCount = if (response?.isSuccessful == true) {
                         val projects = response.body() ?: emptyList()
                         val project: ProjectResponseDto? = projects.firstOrNull()
-                        project?.items?.count { it.status?.name == "APPROVED" } ?: 0
+                        project?.items?.count { it.status == ItemStatus.APPROVED } ?: 0
                     } else 0
 
                     progressMap[workId] = WorkProgressStats(

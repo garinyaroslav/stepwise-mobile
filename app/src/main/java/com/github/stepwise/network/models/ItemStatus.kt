@@ -4,5 +4,12 @@ enum class ItemStatus {
     DRAFT,
     SUBMITTED,
     APPROVED,
-    REJECTED
+    REJECTED;
+
+    fun russian(): String = when (this) {
+        DRAFT -> "Черновик"
+        SUBMITTED -> "Отправлен"
+        APPROVED -> "Одобрено"
+        REJECTED -> "Отклонено"
+    }
 }

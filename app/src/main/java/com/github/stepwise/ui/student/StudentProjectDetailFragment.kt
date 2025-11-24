@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.stepwise.databinding.FragmentStudentProjectDetailBinding
 import com.github.stepwise.network.ApiClient
 import com.github.stepwise.network.models.ExplanatoryNoteItemResponseDto
+import com.github.stepwise.network.models.ItemStatus
 import com.github.stepwise.network.models.ProjectResponseDto
 import com.github.stepwise.network.models.UpdateProjectDto
 import com.github.stepwise.network.models.WorkChapterDto
@@ -129,7 +130,7 @@ class StudentProjectDetailFragment : Fragment() {
     private fun renderHeader(title: String, projectDto: ProjectResponseDto?) {
         binding.tvTitle.text = title
         val total = chapters.size
-        val approved = items.count { it.status?.name == "APPROVED" }
+        val approved = items.count { it.status == ItemStatus.APPROVED }
         binding.tvProgress.text = "$approved / $total"
         binding.progressIndicator.max = if (total > 0) total else 100
         binding.progressIndicator.progress = approved

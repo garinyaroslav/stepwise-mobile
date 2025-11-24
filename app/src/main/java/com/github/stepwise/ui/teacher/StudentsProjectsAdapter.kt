@@ -78,10 +78,9 @@ class StudentsProjectsAdapter(
             val last = items.maxByOrNull { it.submittedAt ?: it.draftedAt ?: "" }
             val statusChip = Chip(holder.itemView.context).apply {
                 isClickable = false
-                text = last?.status?.name ?: "—"
+                text = last?.status?.russian() ?: "—"
             }
-            holder.chipGroup.addView(statusChip)
-        }
+            holder.chipGroup.addView(statusChip)        }
 
         val approvedChip = Chip(holder.itemView.context).apply {
             isClickable = false

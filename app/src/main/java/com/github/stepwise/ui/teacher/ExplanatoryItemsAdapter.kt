@@ -74,7 +74,7 @@ class ExplanatoryItemsAdapter(
         holder.tvTitle.visibility = View.GONE
 
         val status = item.status ?: ItemStatus.DRAFT
-        holder.tvStatus.text = status.name
+        holder.tvStatus.text = status.russian()
         holder.tvComment.text = item.teacherComment ?: ""
 
         val hasFile = !item.fileName.isNullOrBlank()
