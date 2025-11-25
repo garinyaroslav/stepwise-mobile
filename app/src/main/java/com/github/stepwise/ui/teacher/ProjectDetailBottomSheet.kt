@@ -181,8 +181,14 @@ class ProjectDetailBottomSheet : BottomSheetDialogFragment() {
                 val items: List<ExplanatoryNoteItemResponseDto> =
                     (project.items ?: emptyList()).sortedBy { it.orderNumber ?: Int.MAX_VALUE }
 
+                val chapterCount = chapterTitles.size
+                val attachedChapterIndices = items.mapNotNull { it.orderNumber }.toSet()
+                val attachedCount = attachedChapterIndices.size
+
                 val allApproved = items.isNotEmpty() && items.all { it.status == ItemStatus.APPROVED }
-                val canShowApproveProject = !isApprovedForDefense && allApproved
+
+                val allChaptersAttached = chapterCount > 0 && attachedCount >= chapterCount
+                val canShowApproveProject = !isApprovedForDefense && allApproved && allChaptersAttached
 
                 withContext(Dispatchers.Main) {
                     binding.progressLoading.visibility = View.GONE
