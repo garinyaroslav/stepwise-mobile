@@ -34,7 +34,7 @@ import java.io.InputStream
 
 class StudentProjectDetailFragment : Fragment() {
     private var _binding: FragmentStudentProjectDetailBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private var workId: Long = -1L
     private var project: ProjectResponseDto? = null
     private var chapters: List<WorkChapterDto> = emptyList()

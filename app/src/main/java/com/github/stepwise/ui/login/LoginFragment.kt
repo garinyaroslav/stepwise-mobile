@@ -46,7 +46,7 @@ private const val NOTIFICATION_ID_TEMP_PW = 1001
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
     private val prefsName = "stepwise_prefs"
 
